@@ -1,0 +1,33 @@
+<!--                                                                        -->
+<!--                                                                        -->
+<!--  This file is part of the Frama-C plug-in 'PathCrawler' (pc).          -->
+<!--                                                                        -->
+<!--  Copyright (C) 2007-2023                                               -->
+<!--    CEA (Commissariat à l'énergie atomique et aux énergies              -->
+<!--         alternatives)                                                  -->
+<!--                                                                        -->
+<!--  All rights reserved.                                                  -->
+<!--  Contact CEA LIST for licensing.                                       -->
+<!--                                                                        -->
+<!--                                                                        -->
+
+<!-- information about branches -->
+<!ELEMENT ListBranches (Function*)>
+
+<!-- Function -->
+<!ELEMENT Function (B*) >
+<!-- File where this function appears -->
+<!ATTLIST Function File CDATA #REQUIRED>
+<!-- Function name -->
+<!ATTLIST Function Name CDATA #REQUIRED>
+
+<!-- Branch number, as it will appear in program paths in resulting XML files -->
+<!ELEMENT B (#PCDATA) >
+<!-- Subcondition number -->
+<!ATTLIST B N CDATA "1">
+<!ATTLIST B BlocId CDATA "1">
+<!-- Coverage -->
+<!ATTLIST B Neg (yes|no) #IMPLIED>
+<!ATTLIST B Pos (yes|no) #IMPLIED>
+<!ATTLIST B TestCaseIDPos CDATA #IMPLIED>
+<!ATTLIST B TestCaseIDNeg CDATA #IMPLIED>

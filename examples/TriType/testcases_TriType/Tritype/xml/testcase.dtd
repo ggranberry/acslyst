@@ -1,0 +1,104 @@
+<!--                                                                        -->
+<!--                                                                        -->
+<!--  This file is part of the Frama-C plug-in 'PathCrawler' (pc).          -->
+<!--                                                                        -->
+<!--  Copyright (C) 2007-2023                                               -->
+<!--    CEA (Commissariat à l'énergie atomique et aux énergies              -->
+<!--         alternatives)                                                  -->
+<!--                                                                        -->
+<!--  All rights reserved.                                                  -->
+<!--  Contact CEA LIST for licensing.                                       -->
+<!--                                                                        -->
+<!--                                                                        -->
+
+<!-- One Test Case: contains 
+  Test Session Data, 
+  Time when generation of this test case started,
+  Duration of generation of this test case,
+  Inputs data, oracle's Verdict, complete Path, concrete Outputs, 
+  symbolic outputs,
+  the PathPredicate,
+  the Covered Labels by this TC (optional)-->
+<!ELEMENT TestCase (SessionData,Time,Dur,Inputs,Verdict,Prefix,Suffix,Outputs,SymOutputs,PathPredicate,CoveredLabels?)>
+
+<!-- Test Case Number: prefixed by a 'TC_', unique for this session-->
+<!ATTLIST TestCase TestCaseID ID #REQUIRED>
+<!ATTLIST TestCase PrevTestCaseID CDATA #IMPLIED>
+<!ATTLIST TestCase NextTestCaseID CDATA #REQUIRED>
+<!-- Prefix Number: prefixed by a 'P_'-->
+<!ATTLIST TestCase PrefixID CDATA #REQUIRED>
+
+<!-- Test Session Data: contains
+  Function Name, Strategy and time When this generation session started -->
+<!ELEMENT SessionData (FunName,Strategy,When,Version,TestReportFile,TestSessionFile)>
+<!ELEMENT FunName (#PCDATA)>
+<!-- Strategy: contains 4 required attributes and optional text in body 
+(function name in case of func scope) -->
+<!ELEMENT Strategy (#PCDATA)>
+<!ATTLIST Strategy Coverage CDATA #REQUIRED>
+<!ATTLIST Strategy IterLimit CDATA #REQUIRED>
+<!ATTLIST Strategy RecurLimit CDATA #REQUIRED>
+<!ATTLIST Strategy SuffixLengthLimit CDATA #REQUIRED>
+<!ELEMENT When (#PCDATA)>
+<!ELEMENT Version (#PCDATA)>
+
+<!ELEMENT Time (#PCDATA)>
+<!ELEMENT Dur (#PCDATA)>
+
+<!-- Inputs: contains Array Dimensions and Variable Values, with 
+Array or Variable Name and the value Num -->
+<!ELEMENT Inputs (ArDim*,VVal*)>
+<!ELEMENT ArDim (VName,Val)>
+<!ELEMENT VVal (VName,Val)>
+<!ELEMENT VName (#PCDATA)>
+<!ELEMENT Val (#PCDATA)>
+
+<!-- Verdict: contains one required attribute and optional text in body 
+(line number for assert_violated, message for failure, etc.) -->
+<!-- ATTN: consistency with io.pl -->
+<!ELEMENT Verdict (#PCDATA)>
+<!ATTLIST Verdict Type (success|unknown|failure|assert_violated|assert_violated_in_oracle|crashed|hung|interrupt|bug_oracle|maybe_success|maybe_unknown|maybe_failure|invalid_memory_access|div_by_0|deref_null_pointer|use_after_free|uninit_var|invalid_arg|error|no_extra_coverage|none) #REQUIRED>
+
+<!-- Path: Sequence of positive (P) and negative (N) conditions denoted 
+  by line numbers with optional attributes containing source file name (SrcFile)
+  for the first node or when different from the previous node,
+  and label indentifier (LID) when the condition comes from a label -->
+<!ELEMENT Prefix ((P|N)*)>
+<!ELEMENT Suffix ((P|N)*)>
+<!ELEMENT P (#PCDATA)>
+<!ATTLIST P SrcFile CDATA #IMPLIED>
+<!ATTLIST P BlocID CDATA #IMPLIED>
+<!ATTLIST P LID CDATA #IMPLIED>
+<!ELEMENT N (#PCDATA)>
+<!ATTLIST N SrcFile CDATA #IMPLIED>
+<!ATTLIST N BlocID CDATA #IMPLIED>
+<!ATTLIST N LID CDATA #IMPLIED>
+
+<!-- Outputs: List of concrete outputs -->
+<!ELEMENT Outputs (Output*)>
+<!ELEMENT Output (VName,Val)>
+
+<!-- SymOutputs: List of symbolic outputs -->
+<!ELEMENT SymOutputs (SymOutput*)>
+<!ELEMENT SymOutput (VName,Val)>
+
+<!-- PathPredicate: List of constraints of the path predicate
+  with optional attributes containing source file name (SrcFile)
+  for the first node or when different from the previous node, line (L)
+  and label indentifier (LID) when the condition comes from a label -->
+<!ELEMENT PathPredicate (Ctr*)>
+<!ELEMENT Ctr (#PCDATA)>
+<!ATTLIST Ctr L CDATA #IMPLIED>
+<!ATTLIST Ctr SrcFile CDATA #IMPLIED>
+<!ATTLIST Ctr LID CDATA #IMPLIED>
+
+<!-- Separate XML file containing test session file -->
+<!ELEMENT TestSessionFile (#PCDATA)>
+
+<!-- Separate XML file containing test report file -->
+<!ELEMENT TestReportFile (#PCDATA)>
+
+<!-- CoveredLabels: Sequence of elements LID each of them defines a covered label identifier -->
+<!ELEMENT CoveredLabels (LID*)>
+<!ELEMENT LID (#PCDATA)>
+

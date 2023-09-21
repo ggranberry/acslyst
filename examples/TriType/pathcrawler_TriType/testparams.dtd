@@ -1,0 +1,44 @@
+<!--                                                                        -->
+<!--                                                                        -->
+<!--  This file is part of the Frama-C plug-in 'PathCrawler' (pc).          -->
+<!--                                                                        -->
+<!--  Copyright (C) 2007-2023                                               -->
+<!--    CEA (Commissariat à l'énergie atomique et aux énergies              -->
+<!--         alternatives)                                                  -->
+<!--                                                                        -->
+<!--  All rights reserved.                                                  -->
+<!--  Contact CEA LIST for licensing.                                       -->
+<!--                                                                        -->
+<!--                                                                        -->
+
+<!ELEMENT TestParams (FunTestParams*)>
+<!ELEMENT FunTestParams (FunName,FunOffset?,(ArDom|VDom)*,UQPre*,QPre*,Strategy,CPre?)>
+<!ELEMENT FunName (#PCDATA)>
+<!ELEMENT FunOffset (#PCDATA)>
+<!ELEMENT ArDom (VName,(Interval|Element)+)>
+<!ATTLIST ArDom Type (int|float) #REQUIRED>
+<!ELEMENT VDom (VName,(Interval|Element)+)>
+<!ATTLIST VDom Type (int|float) #REQUIRED>
+<!ELEMENT VName (ExpC,((ExpPIF,AuxPred*)|ErrMsg))>
+<!ELEMENT Interval (ErrMsg?)>
+<!ATTLIST Interval Left CDATA #REQUIRED
+                   Right CDATA #REQUIRED>
+<!ELEMENT Element (ErrMsg?)>
+<!ATTLIST Element Number CDATA #REQUIRED>
+<!ELEMENT Cond (Operand,Operand)>
+<!ATTLIST Cond Operation (inf|infegal|sup|supegal|egal|diff) #REQUIRED>
+<!ELEMENT Operand (ExpC,((ExpPIF,AuxPred*)|ErrMsg))>
+<!ELEMENT ExpC (#PCDATA)>
+<!ELEMENT ExpPIF (#PCDATA)>
+<!ELEMENT AuxPred (#PCDATA)>
+<!ELEMENT ErrMsg (#PCDATA)>
+<!ELEMENT UQPre (Cond)>
+<!ELEMENT QPre (UQVar+,Cond*,Operand,Operand)>
+<!ATTLIST QPre Operation (inf|infegal|sup|supegal|egal|diff) #REQUIRED>
+<!ELEMENT UQVar (ErrMsg?)>
+<!ATTLIST UQVar Name CDATA #REQUIRED>
+<!ELEMENT Strategy (ErrMsg?)>
+<!ATTLIST Strategy IterNum CDATA #REQUIRED>
+<!ELEMENT CPre EMPTY>
+<!ATTLIST CPre PreFun CDATA #REQUIRED>
+<!ATTLIST CPre Activate (yes|no) #REQUIRED>

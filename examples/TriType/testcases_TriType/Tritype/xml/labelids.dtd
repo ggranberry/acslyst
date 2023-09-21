@@ -1,0 +1,22 @@
+<!--                                                                        -->
+<!--                                                                        -->
+<!--  This file is part of the Frama-C plug-in 'PathCrawler' (pc).          -->
+<!--                                                                        -->
+<!--  Copyright (C) 2007-2023                                               -->
+<!--    CEA (Commissariat à l'énergie atomique et aux énergies              -->
+<!--         alternatives)                                                  -->
+<!--                                                                        -->
+<!--  All rights reserved.                                                  -->
+<!--  Contact CEA LIST for licensing.                                       -->
+<!--                                                                        -->
+<!--                                                                        -->
+
+<!-- LabelIDs: Sequence of elements LID each of them defines
+  a label identifier (LID),
+  with attributes indicating the file name and the line
+-->
+<!ELEMENT LabelIDs (LID*)>
+<!ELEMENT LID (#PCDATA)>
+<!ATTLIST LID FileName CDATA #IMPLIED>
+<!ATTLIST LID FileLine CDATA #IMPLIED>
+

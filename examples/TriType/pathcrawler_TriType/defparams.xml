@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE DefParams SYSTEM "defparams.dtd">
+<DefParams>
+  <FunTestParams>
+    <FunName>Tritype</FunName>
+    <FunOffset>8956</FunOffset>
+    <FileName>TriType.c</FileName>
+    <Strategy/>
+  </FunTestParams>
+</DefParams>

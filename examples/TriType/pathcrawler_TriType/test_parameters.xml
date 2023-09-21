@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE TestParams SYSTEM "testparams.dtd">
+<TestParams>
+  <FunTestParams>
+    <FunName>Tritype</FunName>
+    <FunOffset>8956</FunOffset>
+    <VDom Type="double">
+      <VName>
+        <ExpC>k</ExpC>
+        <ExpPIF>&apos;k&apos;</ExpPIF>
+      </VName>
+      <Interval Left="-1.7976931348623157e+308" Right="1.7976931348623157e+308"/>
+    </VDom>
+    <VDom Type="double">
+      <VName>
+        <ExpC>j</ExpC>
+        <ExpPIF>&apos;j&apos;</ExpPIF>
+      </VName>
+      <Interval Left="-1.7976931348623157e+308" Right="1.7976931348623157e+308"/>
+    </VDom>
+    <VDom Type="double">
+      <VName>
+        <ExpC>i</ExpC>
+        <ExpPIF>&apos;i&apos;</ExpPIF>
+      </VName>
+      <Interval Left="-1.7976931348623157e+308" Right="1.7976931348623157e+308"/>
+    </VDom>
+    <Strategy/>
+  </FunTestParams>
+</TestParams>

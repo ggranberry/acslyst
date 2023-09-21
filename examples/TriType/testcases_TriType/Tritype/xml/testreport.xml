@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE TestReport SYSTEM "testreport.dtd">
+<?xml-stylesheet href="testreport2html.xsl" type="text/xsl"?>
+<TestReport>
+ <SessionData>
+  <FunName>Tritype</FunName>
+  <Strategy Coverage="all-branches" IterLimit="none" RecurLimit="none" SuffixLengthLimit="none" />
+  <When>Tue Jun 27 15:07:51 2023</When>
+  <Version>4.0. Build Tue May  9 15:05:46 2023</Version>
+  <TestReportFile>testreport.xml</TestReportFile>
+  <TestSessionFile>testsession.xml</TestSessionFile>
+ </SessionData>
+ <Dur>1</Dur>
+ <TotalPrefixNum>18</TotalPrefixNum>
+ <CoveredNum>9</CoveredNum>
+ <TimeoutNum>0</TimeoutNum>
+ <InfeasibleNum>7</InfeasibleNum>
+ <AssumeViolatedNum>0</AssumeViolatedNum>
+ <IterLimitViolatedNum>1</IterLimitViolatedNum>
+ <PCBugNum>0</PCBugNum>
+ <UntreatedNum>0</UntreatedNum>
+ <SubsumedNum>0</SubsumedNum>
+ <SuccessNum>0</SuccessNum>
+ <UnknownNum>9</UnknownNum>
+ <FailureNum>0</FailureNum>
+ <AssertViolatedNum>0</AssertViolatedNum>
+ <CrashedNum>0</CrashedNum>
+ <HungNum>0</HungNum>
+ <InterruptNum>0</InterruptNum>
+ <UninitVarNum>0</UninitVarNum>
+ <BugOracleNum>0</BugOracleNum>
+ <MaybeSuccessNum>0</MaybeSuccessNum>
+ <MaybeUnknownNum>0</MaybeUnknownNum>
+ <MaybeFailureNum>0</MaybeFailureNum>
+ <TermStatus Type="normally">
+ </TermStatus>
+ <UncoveredBranches>
+  <P BlocID="286" SrcFile="TriType.c">17</P>
+ </UncoveredBranches>
+ <UnreachableBranches />
+</TestReport>

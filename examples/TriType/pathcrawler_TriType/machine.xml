@@ -1,0 +1,34 @@
+<MACHINE>
+<ENDIAN TYPE="little_endian" />
+<CHAR_SIGN TYPE="signed" />
+<PRIMITIVES>
+	<PRIMITIVE ID="p__Bool" TYPE_NAME="_Bool" SIZE="1" ALIGN="1" />
+	<PRIMITIVE ID="p_char" TYPE_NAME="char" SIZE="1" ALIGN="1" />
+	<PRIMITIVE ID="p_signed_char" TYPE_NAME="signed char" SIZE="1" ALIGN="1" />
+	<PRIMITIVE ID="p_unsigned_char" TYPE_NAME="unsigned char" SIZE="1" ALIGN="1" />
+	<PRIMITIVE ID="p_int" TYPE_NAME="int" SIZE="4" ALIGN="4" />
+	<PRIMITIVE ID="p_unsigned_int" TYPE_NAME="unsigned int" SIZE="4" ALIGN="4" />
+	<PRIMITIVE ID="p_short" TYPE_NAME="short" SIZE="2" ALIGN="2" />
+	<PRIMITIVE ID="p_unsigned_short" TYPE_NAME="unsigned short" SIZE="2" ALIGN="2" />
+	<PRIMITIVE ID="p_long" TYPE_NAME="long" SIZE="8" ALIGN="8" />
+	<PRIMITIVE ID="p_unsigned_long" TYPE_NAME="unsigned long" SIZE="8" ALIGN="8" />
+	<PRIMITIVE ID="p_long_long" TYPE_NAME="long long" SIZE="8" ALIGN="8" />
+	<PRIMITIVE ID="p_unsigned_long_long" TYPE_NAME="unsigned long long" SIZE="8" ALIGN="8" />
+	<PRIMITIVE ID="p_float" TYPE_NAME="float" SIZE="4" ALIGN="4" />
+	<PRIMITIVE ID="p_double" TYPE_NAME="double" SIZE="8" ALIGN="8" />
+	<PRIMITIVE ID="p_long_double" TYPE_NAME="long double" SIZE="16" ALIGN="16" />
+	<PRIMITIVE ID="p_ptr" TYPE_NAME="ptr" SIZE="4" ALIGN="8" />
+</PRIMITIVES>
+<STRUCTS>
+<STRUCTS>
+</STRUCTS>
+</STRUCTS>
+<UNIONS>
+<UNIONS>
+</UNIONS>
+</UNIONS>
+<ENUMS>
+<UNIONS>
+</UNIONS>
+</ENUMS>
+</MACHINE>

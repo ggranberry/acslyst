@@ -1,0 +1,89 @@
+<!--                                                                        -->
+<!--                                                                        -->
+<!--  This file is part of the Frama-C plug-in 'PathCrawler' (pc).          -->
+<!--                                                                        -->
+<!--  Copyright (C) 2007-2023                                               -->
+<!--    CEA (Commissariat à l'énergie atomique et aux énergies              -->
+<!--         alternatives)                                                  -->
+<!--                                                                        -->
+<!--  All rights reserved.                                                  -->
+<!--  Contact CEA LIST for licensing.                                       -->
+<!--                                                                        -->
+<!--                                                                        -->
+
+<!-- Test Report: contains 
+  Test Session Data, Duration;
+  test session statistics,
+  the Unreachable and Uncovered Branches by this test session (optional)
+  the Uncovered Labels by this test session (optional)
+ -->
+<!ELEMENT TestReport (SessionData,Dur,TotalPrefixNum,CoveredNum,TimeoutNum,InfeasibleNum,AssumeViolatedNum,IterLimitViolatedNum,PCBugNum,UntreatedNum,SubsumedNum,SuccessNum,UnknownNum,FailureNum,AssertViolatedNum,CrashedNum,HungNum,SegFaultNum,UninitVarNum,BugOracleNum,MaybeSuccessNum,MaybeUnknownNum,MaybeFailureNum,TermStatus?,UnreachableBranches?,UncoveredBranches?,UncoveredLabels?)>
+
+<!-- Test Session Data: contains
+  Function Name, Strategy and time When this generation session started -->
+<!ELEMENT SessionData (FunName,Strategy,When,Version,TestReportFile,TestSessionFile)>
+<!ELEMENT FunName (#PCDATA)>
+<!-- Strategy: contains 3 required attributes and optional text in body 
+(function name in case of func scope) -->
+<!ELEMENT Strategy (#PCDATA)>
+<!ATTLIST Strategy Coverage CDATA #REQUIRED>
+<!ATTLIST Strategy IterLimit CDATA #REQUIRED>
+<!ATTLIST Strategy RecurLimit CDATA #REQUIRED>
+<!ATTLIST Strategy SuffixLengthLimit CDATA #REQUIRED>
+<!ELEMENT When (#PCDATA)>
+<!ELEMENT Version (#PCDATA)>
+
+<!ELEMENT Dur (#PCDATA)>
+
+<!-- Number of treated path prefixes: Total and for each status -->
+<!ELEMENT TotalPrefixNum (#PCDATA)>
+<!ELEMENT CoveredNum (#PCDATA)>
+<!ELEMENT TimeoutNum (#PCDATA)>
+<!ELEMENT InfeasibleNum (#PCDATA)>
+<!ELEMENT AssumeViolatedNum (#PCDATA)>
+<!ELEMENT IterLimitViolatedNum (#PCDATA)>
+<!ELEMENT PCBugNum (#PCDATA)>
+<!ELEMENT UntreatedNum (#PCDATA)>
+<!ELEMENT SubsumedNum (#PCDATA)>
+<!ELEMENT UninitVarNum (#PCDATA)>
+
+<!-- Number of test cases with each verdict -->
+<!ELEMENT SuccessNum (#PCDATA)>
+<!ELEMENT UnknownNum (#PCDATA)>
+<!ELEMENT FailureNum (#PCDATA)>
+<!ELEMENT AssertViolatedNum (#PCDATA)>
+<!ELEMENT InterruptNum (#PCDATA)>
+<!ELEMENT CrashedNum (#PCDATA)>
+<!ELEMENT HungNum (#PCDATA)>
+<!ELEMENT BugOracleNum (#PCDATA)>
+<!ELEMENT MaybeSuccessNum (#PCDATA)>
+<!ELEMENT MaybeUnknownNum (#PCDATA)>
+<!ELEMENT MaybeFailureNum (#PCDATA)>
+
+<!-- Separate XML file containing test session file -->
+<!ELEMENT TestSessionFile (#PCDATA)>
+
+<!-- Separate XML file containing test report file -->
+<!ELEMENT TestReportFile (#PCDATA)>
+
+<!-- Termination status -->
+<!ELEMENT TermStatus (#PCDATA)>
+<!ATTLIST TermStatus Type CDATA #REQUIRED>
+
+<!-- UnreachableBranches: Sequence of positive (P) and negative (N) conditions denoted 
+     by line and node numbers and source file name -->
+<!ELEMENT UnreachableBranches ((P|N)*)>
+<!ELEMENT P (#PCDATA)>
+<!ATTLIST P SrcFile CDATA #REQUIRED>
+<!ATTLIST P BlocID CDATA #REQUIRED>
+<!ELEMENT N (#PCDATA)>
+<!ATTLIST N SrcFile CDATA #REQUIRED>
+<!ATTLIST N BlocID CDATA #REQUIRED>
+
+<!-- UncoveredBranches: Sequence of positive (P) and negative (N) conditions denoted 
+     by line and node numbers and source file name -->
+<!ELEMENT UncoveredBranches ((P|N)*)>
+
+<!-- UncoveredLabels: Sequence of elements LID each of them defines an uncovered label identifier -->
+<!ELEMENT UncoveredLabels (LID*)>
+<!ELEMENT LID (#PCDATA)>

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--                                                                        -->
+<!--                                                                        -->
+<!--  This file is part of the Frama-C plug-in 'PathCrawler' (pc).          -->
+<!--                                                                        -->
+<!--  Copyright (C) 2007-2023                                               -->
+<!--    CEA (Commissariat à l'énergie atomique et aux énergies              -->
+<!--         alternatives)                                                  -->
+<!--                                                                        -->
+<!--  All rights reserved.                                                  -->
+<!--  Contact CEA LIST for licensing.                                       -->
+<!--                                                                        -->
+<!--                                                                        -->
+
+<!DOCTYPE xsl:stylesheet [<!ENTITY nbsp "&#160;">]>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:output
+      method="html"
+      encoding="ISO-8859-1"
+      doctype-public="-//W3C//DTD HTML 4.01//EN"
+      doctype-system="http://www.w3.org/TR/html4/strict.dtd"
+      indent="yes"
+      />
+
+  <xsl:param name="paramExtHTML"></xsl:param>
+  <xsl:param name="paramRefresh">no</xsl:param>
+<!--Varaibles for help messages -->
+  <xsl:variable name="criterionHelp">Items to be covered by the set of test cases</xsl:variable>  
+  <xsl:variable name="pathPrefixHelp">The execution path or partial path explored, see help page for notation</xsl:variable> 
+  <xsl:variable name="verdictHelp">If a test-case was generated, then was its result satisfactory according to the oracle used ?</xsl:variable> 
+  <xsl:variable name="timeHelp">Time elapsed since the start of test-case generation</xsl:variable>
+  <xsl:variable name="statusHelp">Test generation status, see help page for explanation of different statuses</xsl:variable>
+<!--END Varaibles for help messages -->
+   
+  <xsl:template match="/">
+    <html>
+      <head>
+	<link rel="stylesheet" href="style.css" type="text/css"/>
+	<xsl:if test="$paramRefresh != 'no'"><xsl:element name="meta"><xsl:attribute name="http-equiv">refresh</xsl:attribute><xsl:attribute name="content"><xsl:value-of select="$paramRefresh"/></xsl:attribute></xsl:element></xsl:if>
+	<title>Test session results</title>
+      </head>
+      <body>
+	<h2 class="page_title">Path prefixes explored</h2>
+	<xsl:apply-templates  select="TestSession"/>
+      </body>
+    </html>
+  </xsl:template>
+  <xsl:template match="TestSession">
+<!--
+    <div class="centered">
+      <table border="0" width="100%" cellpadding="2">
+	<tr><td align="center" width="100%">
+	  <xsl:element name="a"><xsl:attribute name="href"><xsl:value-of select="SessionData/TestReportFile"/><xsl:value-of select="$paramExtHTML"/></xsl:attribute>View test session summary</xsl:element>
+	</td></tr>      
+      </table>
+    </div>
+-->
+    <h3 class="section_title">General test session information</h3>
+    <div class="centered">
+
+      <xsl:comment><p><b>Session started: </b><xsl:value-of select="SessionData/When"/></p></xsl:comment><xsl:text>
+</xsl:text>
+ <xsl:comment><p><b>PathCrawler version: </b><xsl:value-of select="SessionData/Version"/></p></xsl:comment><xsl:text>
+</xsl:text>
+
+      <p><b>Function under test: </b> <xsl:value-of select="SessionData/FunName"/></p>
+      <p><b>Coverage criterion:&nbsp;<img src="help.gif" border="0" 
+	   alt="{$criterionHelp}" title="{$criterionHelp}" style="cursor: help;" align="bottom"/>&nbsp;&nbsp;</b> 
+      <xsl:if test="SessionData/Strategy/@Coverage = 'all-paths'">all feasible paths</xsl:if>
+      <xsl:if test="SessionData/Strategy/@Coverage = 'all-branches'">all reachable branches</xsl:if>
+      <xsl:if test="SessionData/Strategy/@Coverage = 'all-mcdc'">mcdc of all decisions</xsl:if>
+      <xsl:if test="SessionData/Strategy/@Coverage = 'paths-func'">all feasible paths in function <xsl:value-of select="SessionData/Strategy"/></xsl:if>
+      <xsl:if test="SessionData/Strategy/@Coverage = 'branches-func'">all reachable branches in function <xsl:value-of select="SessionData/Strategy"/></xsl:if>
+      <xsl:if test="SessionData/Strategy/@Coverage = 'mcdc-func'">mcdc of all decisions in function <xsl:value-of select="SessionData/Strategy"/></xsl:if>
+      <xsl:if test="SessionData/Strategy/@IterLimit != 'none'">, limit loop unrolling to <xsl:value-of select="SessionData/Strategy/@IterLimit"/></xsl:if>      
+      <xsl:if test="SessionData/Strategy/@RecurLimit != 'none'">, limit recursion unfolding to <xsl:value-of select="SessionData/Strategy/@RecurLimit"/></xsl:if>      
+      <xsl:if test="SessionData/Strategy/@SuffixLengthLimit != 'none'">, limit number of conditions treated in path suffix to <xsl:value-of select="SessionData/Strategy/@SuffixLengthLimit"/></xsl:if>      
+      </p>      
+    </div>
+    
+    <h3 class="section_title">Path prefixes explored</h3>
+    <div class="centered">
+      <p align="justify">This table shows the path prefixes explored one by one during test-case generation.</p>
+    </div>
+      <table align="center"  width="100%" border="1" cellpadding="2">
+	<tr class="input_data_caption">
+	  <td align="center"><b>Prefix ID</b></td>
+	  <td align="center"><b>Time, sec.</b>&nbsp;<img src="help.gif" border="0" alt="{$timeHelp}" title="{$timeHelp}" style="cursor: help;" align="bottom"/></td>
+	  <td align="center"><b>Status</b>&nbsp;<img src="help.gif" border="0" alt="{$statusHelp}" title="{$statusHelp}" style="cursor: help;" align="bottom"/></td>
+	  <td align="center"><b>Test case ID</b></td>
+	  <td align="center"><b>Verdict</b>&nbsp;<img src="help.gif" border="0" alt="{$verdictHelp}" title="{$verdictHelp}" style="cursor: help;" align="bottom"/></td>
+	  <td align="left"><b>&nbsp;&nbsp;Path prefix/<font color='grey'>suffix</font></b>&nbsp;<img src="help.gif" border="0" 
+	   alt="{$pathPrefixHelp}" title="{$pathPrefixHelp}" style="cursor: help;" align="bottom"/></td>
+	</tr>
+	<xsl:for-each select="PrefixData">
+	  <tr>	    
+	    <td align="left">
+	      <xsl:value-of select="@PrefixID"/>
+	      <xsl:element name="a">
+		<xsl:attribute name="name"><xsl:value-of select="@PrefixID"/></xsl:attribute>
+		<xsl:text>&nbsp;</xsl:text>
+	      </xsl:element>
+	    </td>
+	    <td align="center">
+	      <xsl:value-of select="Dur"/>
+	    </td>
+	    <xsl:apply-templates select="PrefixStatus"/>
+	    <td align="left">
+	      <xsl:if test="TestCaseFile">
+		<xsl:element name="a">
+		  <xsl:attribute name="href">
+		    <xsl:value-of select="TestCaseFile"/>
+		    <xsl:value-of select="$paramExtHTML"/>
+		  </xsl:attribute>
+		  <xsl:value-of select="@TestCaseID"/>
+		</xsl:element>
+	      </xsl:if>&nbsp;
+	    </td>
+	    <xsl:if test="Verdict"><xsl:apply-templates select="Verdict"/></xsl:if>    
+	    <xsl:if test="not(Verdict)"><td>&nbsp;</td></xsl:if> 
+	    <td align="left" nowrap="true">
+		<xsl:choose>
+			<xsl:when test="not(Prefix/*) and not(Suffix/*)">
+				<i>empty</i>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:if test="Prefix/*">
+					<xsl:apply-templates select="Prefix"/>
+				</xsl:if>
+				<xsl:if test="Suffix/*">
+					<font color='grey'><xsl:apply-templates select="Suffix"/></font>
+				</xsl:if>
+			</xsl:otherwise>
+		</xsl:choose>
+	        &nbsp;
+	    </td>
+ 	  </tr>
+	</xsl:for-each>
+      </table>
+  </xsl:template>
+  
+  <xsl:template match="Prefix|Suffix">
+    <xsl:if test="child::*"><xsl:apply-templates select="child::*"/></xsl:if>
+    <xsl:if test="not(child::*)"><i>(empty)</i></xsl:if>
+  </xsl:template>
+
+  <xsl:template match="N"><xsl:if test="@SrcFile"><xsl:value-of select="@SrcFile"/> : </xsl:if>-<xsl:value-of select="."/>;</xsl:template>
+  
+  <xsl:template match="P"><xsl:if test="@SrcFile"><xsl:value-of select="@SrcFile"/> : </xsl:if>+<xsl:value-of select="."/>;</xsl:template>
+
+  <!-- ATTN: consistency with io.pl -->
+  <xsl:template match="Verdict">	    
+    <xsl:element name="td">	    	   
+      <xsl:if test="../TestCaseFile">
+	<xsl:attribute name="align">center</xsl:attribute>
+	<xsl:attribute name="title">
+	  <xsl:value-of select="./@Type"/>
+	  <xsl:if test=". != ''">
+	    <xsl:text> - </xsl:text>
+	    <xsl:value-of select="."/>
+	  </xsl:if>    
+	</xsl:attribute>
+	<xsl:if test="@Type = 'success'">success</xsl:if>
+	<xsl:if test="@Type = 'unknown'">unknown</xsl:if>
+	<xsl:if test="@Type = 'failure'"><font class="attn">failure</font></xsl:if>
+	<xsl:if test="@Type = 'assert_violated'"><font class="attn">user assert KO</font></xsl:if>
+	<xsl:if test="@Type = 'assert_violated_in_oracle'"><font class="attn">user assert KO in oracle</font></xsl:if>
+	<xsl:if test="@Type = 'crashed'"><font class="attn">crashed</font></xsl:if>
+	<xsl:if test="@Type = 'hung'"><font class="attn">hung</font></xsl:if>
+	<xsl:if test="@Type = 'interrupt'"><font class="attn">interrupt</font></xsl:if>
+	<xsl:if test="@Type = 'bug_oracle'"><font class="warn">oracle bug</font></xsl:if>
+	<xsl:if test="@Type = 'maybe_success'"><font class="warn">maybe success</font></xsl:if>
+	<xsl:if test="@Type = 'maybe_unknown'"><font class="warn">maybe unknown</font></xsl:if>
+	<xsl:if test="@Type = 'maybe_failure'"><font class="warn">maybe failure</font></xsl:if>
+	<xsl:if test="@Type = 'invalid_memory_access'"><font class="warn">invalid_memory_access</font></xsl:if>
+	<xsl:if test="@Type = 'deref_null_pointer'"><font class="warn">deref.null ptr</font></xsl:if>
+	<xsl:if test="@Type = 'use_after_free'"><font class="warn">use after free</font></xsl:if>
+	<xsl:if test="@Type = 'div_by_0'"><font class="warn">division by zero</font></xsl:if>
+	<xsl:if test="@Type = 'uninit_var'"><font class="warn">uninitialized variable</font></xsl:if>
+	<xsl:if test="@Type = 'invalid_arg'"><font class="warn">invalid arg.</font></xsl:if>
+	<xsl:if test="@Type = 'error'"><font class="warn">error</font></xsl:if>
+        <xsl:if test="@Type = 'no_extra_coverage'"><font class="warn">no extra coverage</font></xsl:if>
+        <xsl:if test="@Type = 'none'"><font class="warn">none</font></xsl:if>
+      </xsl:if>	    
+    </xsl:element>
+  </xsl:template>
+
+  <!-- ATTN: consistency with io.pl -->
+  <xsl:template match="PrefixStatus">
+    <xsl:element name="td">
+      <xsl:attribute name="align">center</xsl:attribute>
+      <xsl:attribute name="title">
+	<xsl:if test="@Status = 'covered'">test case was generated</xsl:if>
+	<xsl:if test="@Status = 'timeout'">stopped by timeout</xsl:if>
+	<xsl:if test="@Status = 'infeasible'">infeasible path</xsl:if>
+	<xsl:if test="@Status = 'assume_violated'">user assume violated</xsl:if>
+	<xsl:if test="@Status = 'iteration_limit_violated'">iteration or recursion limit violated</xsl:if>
+	<xsl:if test="@Status = 'no_extra_coverage'">no extra coverage</xsl:if>
+	<xsl:if test="@Status = 'PC_bug'">please report this PathCrawler bug</xsl:if>
+	<xsl:if test="@Status = 'untreated'">PathCrawler could not treat this path</xsl:if>
+	<xsl:if test="@Status = 'subsumed'">this is a prefix of another path</xsl:if>	
+	<xsl:if test=". != ''">
+	  <xsl:text> - </xsl:text>
+	  <xsl:value-of select="."/>
+	</xsl:if>	
+      </xsl:attribute>
+      <xsl:if test="@Status = 'covered'">covered</xsl:if>
+      <xsl:if test="@Status = 'timeout'"><font class="warn">timeout</font></xsl:if>
+      <xsl:if test="@Status = 'infeasible'">infeas.</xsl:if>
+      <xsl:if test="@Status = 'assume_violated'">assume KO</xsl:if>
+      <xsl:if test="@Status = 'iteration_limit_violated'">iter. limit</xsl:if>
+      <xsl:if test="@Status = 'no_extra_coverage'">superfluous</xsl:if>
+      <xsl:if test="@Status = 'PC_bug'"><font class="warn">PC bug</font></xsl:if>
+      <xsl:if test="@Status = 'untreated'"><font class="warn">untreated</font></xsl:if>
+      <xsl:if test="@Status = 'subsumed'"><font class="warn">subsumed</font></xsl:if>
+    </xsl:element>
+  </xsl:template>
+ 
+</xsl:stylesheet>

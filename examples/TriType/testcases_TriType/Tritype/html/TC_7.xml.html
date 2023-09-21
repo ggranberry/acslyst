@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" href="style.css" type="text/css">
+<title>Test-case TC_7</title>
+</head>
+<body>
+<h2 class="page_title">Test-case TC_7</h2>
+<div class="centered"><table border="0" width="100%" cellpadding="2"><tr>
+<td align="left" width="25%">
+<a href="TC_6.xml.html">Previous TC</a> 
+	      </td>
+<td align="center" width="50%"> 
+	      </td>
+<td align="right" width="25%">
+<a href="TC_8.xml.html">Next TC</a> 
+	      </td>
+</tr></table></div>
+<h3 class="section_title">Test-case data</h3>
+<div class="centered">
+<p><b>Input array sizes:</b></p>
+<table class="input_data">
+<tr class="input_data_caption">
+<th>Array (or pointer)</th>
+<th>Number of elements</th>
+</tr>
+<tr><td colspan="2"><i>(empty)</i></td></tr>
+</table>
+<p><b>Input values:</b></p>
+<table class="input_data">
+<tr class="input_data_caption">
+<th>Variable</th>
+<th>Value</th>
+</tr>
+<tr>
+<td>i</td>
+<td>-0</td>
+</tr>
+<tr>
+<td>j</td>
+<td>4.9406564584124654e-324</td>
+</tr>
+<tr>
+<td>k</td>
+<td>-0</td>
+</tr>
+</table>
+<p><b>Verdict:</b> <img src="help.gif" border="0" alt="Was the result satisfactory according to the oracle used?" title="Was the result satisfactory according to the oracle used?" style="cursor: help;" align="bottom">  unknown</p>
+<p><b>Path:</b> <img src="help.gif" border="0" alt="Complete execution path covered, see help page for notation" title="Complete execution path covered, see help page for notation" style="cursor: help;" align="bottom">  
+	TriType.c : -10a; -10b; -10c; -12a; -12b; TriType.c : +12c; </p>
+<p><b>Outputs:</b> <img src="help.gif" border="0" alt="Concrete output values (an output name starting with res__ denotes the value returned by the tested function)" title="Concrete output values (an output name starting with res__ denotes the value returned by the tested function)" style="cursor: help;" align="bottom"></p>
+<table class="input_data">
+<tr class="input_data_caption">
+<th>Expression</th>
+<th>Value</th>
+</tr>
+<tr>
+<td>return value</td>
+<td>3</td>
+</tr>
+</table>
+<p><b>Symbolic outputs:</b> <img src="help.gif" border="0" alt="Outputs expressed as a function of inputs, unless constant (an output name starting with res__ denotes the value returned by the tested function)" title="Outputs expressed as a function of inputs, unless constant (an output name starting with res__ denotes the value returned by the tested function)" style="cursor: help;" align="bottom"></p>
+<table class="input_data">
+<tr class="input_data_caption">
+<th>Expression</th>
+<th>Value</th>
+</tr>
+<tr>
+<td>return value</td>
+<td>3</td>
+</tr>
+</table>
+<p><b>Path predicate:</b> <img src="help.gif" border="0" alt="The logical predicate over input variables satisfied by this test-case and all other cases which would cover this path" title="The logical predicate over input variables satisfied by this test-case and all other cases which would cover this path" style="cursor: help;" align="bottom"></p>
+<p><span class="marge">i&gt;=0<b> AND </b></span></p>
+<p><span class="marge">j&gt;=0<b> AND </b></span></p>
+<p><span class="marge">k&gt;=0<b> AND </b></span></p>
+<p><span class="marge">(i+j)&gt;k<b> AND </b></span></p>
+<p><span class="marge">(j+k)&gt;i<b> AND </b></span></p>
+<p><span class="marge">(k+i)=&lt;j</span></p>
+<p><a href="../testdrivers/TC_7.c" target="_blank">View test driver</a></p>
+<p><b>Path prefix ID:</b> <img src="help.gif" border="0" alt="The execution path or partial path whose treatment generated this test-case" title="The execution path or partial path whose treatment generated this test-case" style="cursor: help;" align="bottom">  <a href="testsession.xml.html#P_6">P_6</a></p>
+</div>
+<h3 class="section_title">General information</h3>
+<div class="centered">
+<!--Session started: Tue Jun 27 15:07:51 2023-->
+<!--PathCrawler version: 4.0. Build Tue May  9 15:05:46 2023-->
+<p><b>Function under test: </b>Tritype</p>
+<p><b>Coverage criterion:</b> <img src="help.gif" border="0" alt="Items to be covered by the set of test cases" title="Items to be covered by the set of test cases" style="cursor: help;" align="bottom">   all reachable branches</p>
+<p><b>Generated: </b>Tue Jun 27 15:07:52 2023</p>
+<p><b>Time elapsed since test session started: </b>1 sec.</p>
+</div>
+<div class="centered"><table border="0" width="100%" cellpadding="2"><tr>
+<td align="left" width="25%">
+<a href="TC_6.xml.html">Previous TC</a> 
+	      </td>
+<td align="center" width="50%"> 
+	      </td>
+<td align="right" width="25%">
+<a href="TC_8.xml.html">Next TC</a> 
+	      </td>
+</tr></table></div>
+</body>
+</html>
