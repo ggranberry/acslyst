@@ -4,7 +4,7 @@ from pathcrawler import run_pathcrawler
 from annotation_evaluator import AnnotationEvaluator
 
 
-def generate_acsl(
+def exec_on_program(
     program_file: str, main_function=None, oracle_file=None, oracle_function=None
 ):
     with open(program_file) as file:
@@ -33,7 +33,6 @@ def generate_acsl(
     res = pathcrawler_chain.invoke({"csv": csv, "program": most_recent_program})
     print(res.get("text"))
 
-
 if __name__ == "__main__":
     print("This script is being run directly.")
-    generate_acsl("examples/Bsearch/f.c")
+    exec_on_program("examples/Bsearch/f.c")
