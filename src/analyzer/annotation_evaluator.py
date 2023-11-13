@@ -22,6 +22,7 @@ class AnnotationEvaluator(StringEvaluator):
         return {
             "program": prediction,
             "rank": score,
+            "classifications": extract_classification_count(prediction),
         }
 
 

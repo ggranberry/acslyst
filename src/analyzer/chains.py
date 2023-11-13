@@ -6,7 +6,7 @@ from langchain.schema.output_parser import StrOutputParser
 
 
 
-model = ChatOpenAI(max_tokens=1000)
+model = ChatOpenAI(model= "gpt-4-1106-preview",max_tokens=1000)
 # memory = ConversationBufferWindowMemory(k=1, memory_key="history")
 
 acsl_generation_chain = LLMChain(

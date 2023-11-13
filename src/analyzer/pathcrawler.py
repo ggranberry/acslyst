@@ -5,33 +5,39 @@ import os
 import tempfile
 import shutil
 
-base_temp_dir = os.path.join(os.getcwd(), "temp_files")
-
-def run_pathcrawler(program_str):
+def run_pathcrawler(program_str, main_function, oracle_file):
     base_temp_dir = os.path.join(os.getcwd(), "temp_files")
     temp_dir = tempfile.mkdtemp(dir=base_temp_dir)
-    shutil.copy("./examples/Bsearch/OtherCfiles/oracle_testme.c", temp_dir)
     try:
-        res = exec_pathcrawler(program_str, temp_dir)
+        res = exec_pathcrawler(program_str, temp_dir, main_function, oracle_file)
         res.check_returncode()
-        csv = get_test_cases_csv(f"{temp_dir}/testcases_temp_file/main/xml")
+        csv = get_test_cases_csv(f"{temp_dir}/testcases_temp_file/{main_function}/xml")
         return csv
     finally:
         shutil.rmtree(temp_dir)
 
+# So we have so original file path which is formulated outside the container
+# Now that we're in the container, we need to get the path to the file inside the container
 
-def exec_pathcrawler(program_str: str, temp_dir: str):
-    example_dir = "examples"
+def exec_pathcrawler(program_str: str, temp_dir: str, main_function: str, oracle_file: str):
     temp_file_path = os.path.join(temp_dir, "temp_file.c")
 
     # Write the program to a temporary file
     with open(temp_file_path, "w") as tmp:
         tmp.write(program_str)
 
+
+
+    if oracle_file is not None:
+        shutil.copy(oracle_file, temp_dir)
+        oracle_command = f"-pc-oracle /work/tmp/oracle_{main_function}.c"
+    else:
+        oracle_command = ""
+
     # Prepare the Docker command
     docker_command = (
-    f"frama-c -pc -no-frama-c-stdlib -variadic-no-translation "
-    f"-machdep gcc_x86_64 -lib-entry -pc-xml -pc-oracle /work/tmp/oracle_testme.c -pc-all-branches /work/tmp/temp_file.c && ls -la /work/tmp"
+    f"frama-c -pc -no-frama-c-stdlib -variadic-no-translation -main {main_function} "
+    f"-machdep gcc_x86_64 -lib-entry -pc-xml {oracle_command} -pc-all-branches /work/tmp/temp_file.c"
 )
     cmd = [
         "docker",

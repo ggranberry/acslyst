@@ -1,39 +1,22 @@
-from chains import acsl_generation_chain, pathcrawler_chain
-from repair import repair
-from pathcrawler import run_pathcrawler
-from annotation_evaluator import AnnotationEvaluator
+import argparse
+from harnesses.pathcrawler import PathCrawlerHarness
 
-
-def generate_acsl(
-    program_file: str, main_function=None, oracle_file=None, oracle_function=None
-):
-    with open(program_file) as file:
-        content = file.read()
-
-    print("generating ACSL annotations...")
-    # First we generate 5 initial attempts to try and find a good starting point
-    initial_generations = [
-        acsl_generation_chain.invoke({"program": content}).get("text") for _ in range(5)
-    ]
-    evalulator = AnnotationEvaluator()
-    ranked_results = list(
-        map(lambda x: evalulator.evaluate_strings(prediction=x), initial_generations)
-    )
-    choice = max(ranked_results, key=lambda x: x["rank"])
-    most_recent_program = choice["program"]
-
-    print("validating...")
-    most_recent_program = repair(most_recent_program, "initial acsl")
-    print(most_recent_program)
-
-    print("generating pathcrawler output...")
-    csv = run_pathcrawler(most_recent_program)
-
-    print("gaining new insight from pathcrawler output...")
-    res = pathcrawler_chain.invoke({"csv": csv, "program": most_recent_program})
-    print(res.get("text"))
-
+def main(args):
+    # Your main function logic goes here
+    if args.pathcrawler:
+        harness = PathCrawlerHarness()
+        harness.run()
 
 if __name__ == "__main__":
-    print("This script is being run directly.")
-    generate_acsl("examples/Bsearch/f.c")
+    # Set up the argument parser
+    parser = argparse.ArgumentParser(description="Generate ACSL annotations for a suite of C programs")
+
+    # Add flags
+    parser.add_argument('-p', '--pathcrawler', action='store_true', help='Generate for pathcrawler test suite')
+
+    # Parse arguments
+    args = parser.parse_args()
+
+    # Call the main function with the parsed arguments
+    main(args)
+

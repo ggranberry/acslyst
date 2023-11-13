@@ -32,7 +32,3 @@ def exec_on_program(
     print("gaining new insight from pathcrawler output...")
     res = pathcrawler_chain.invoke({"csv": csv, "program": most_recent_program})
     print(res.get("text"))
-
-if __name__ == "__main__":
-    print("This script is being run directly.")
-    exec_on_program("examples/Bsearch/f.c")
