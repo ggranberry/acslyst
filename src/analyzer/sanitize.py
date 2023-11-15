@@ -14,3 +14,8 @@ def extract_classification_count(text):
         classifications[name.strip()] = int(count)
     return classifications
 
+def llm_output_parser(llm_output):
+    program = extract_c_program(llm_output)
+    classification_counts = extract_classification_count(llm_output)
+    return program, classification_counts
+

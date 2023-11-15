@@ -3,17 +3,39 @@ import tempfile
 import subprocess
 import tempfile
 
-def exec_wp(annotated_program : str):
+
+def exec_wp(annotated_program: str):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".c", mode="w") as tmp_file:
         tmp_file.write(annotated_program)
         tmp_file_name = tmp_file.name
-    command = ["frama-c", "-wp", "-wp-rte", "-wp-prover", "Alt-Ergo,Z3", "-wp-timeout", "10", tmp_file_name]
+    command = [
+        "frama-c",
+        "-wp",
+        "-wp-rte",
+        "-wp-prover",
+        "Alt-Ergo,Z3",
+        "-wp-timeout",
+        "10",
+        tmp_file_name,
+    ]
     try:
         return subprocess.run(command, capture_output=True, text=True)
     finally:
         os.remove(tmp_file_name)
 
-def extract_proof_count_score(wp_output : str):
+
+def extract_proofs_and_goals(wp_output: str):
+    lines = wp_output.split("\n")
+    maybe_proved = filter(lambda line: "Proved goals" in line, lines)
+    prove_line = next(maybe_proved, None)
+    if prove_line is None:
+        return -1, -1
+
+    _, after = prove_line.split(":", 1)
+    return after.split("/", 1)
+
+
+def extract_proof_count_score(wp_output: str):
     """
     extracts the number of proved annotations from the wp output which looks like this:
 
@@ -34,25 +56,13 @@ def extract_proof_count_score(wp_output : str):
     Qed:             8
     Alt-Ergo :       2 (16ms-18ms)
     Z3 4.12.2:       1 (20ms)
-    Timeout:         7 
+    Timeout:         7
     """
-    lines = wp_output.split("\n")
-    maybe_proved = filter(lambda line: "Proved goals" in line, lines)
-    prove_line = next(maybe_proved, None)
-    if(prove_line is None):
-        return 0 
-
-    _, after = prove_line.split(":", 1)
-    proved, goals = after.split("/", 1)
+    proved, goals = extract_proofs_and_goals(wp_output)
     ratio_proved = int(proved) / int(goals)
     if ratio_proved >= 1:
-        return .75
-    elif ratio_proved >= .5:
-        return .5
+        return 0.75
+    elif ratio_proved >= 0.5:
+        return 0.5
     else:
-        return .25
-    
-    
-
-    
-
+        return 0.25

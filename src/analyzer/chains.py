@@ -1,36 +1,20 @@
 from langchain.chains.llm import LLMChain
 from langchain.chat_models import ChatOpenAI
 import prompts
-from langchain.memory import ConversationBufferWindowMemory
 from langchain.schema.output_parser import StrOutputParser
+from sanitize import llm_output_parser
 
 
+model = ChatOpenAI(model="gpt-4-1106-preview", max_tokens=1000)
 
-model = ChatOpenAI(model= "gpt-4-1106-preview",max_tokens=1000)
-# memory = ConversationBufferWindowMemory(k=1, memory_key="history")
-
-acsl_generation_chain = LLMChain(
-    prompt=prompts.initial_prompt,
-    llm=model,
-    output_parser=StrOutputParser(),
+acsl_generation_chain = (
+    prompts.initial_prompt | model | StrOutputParser() | llm_output_parser
 )
-
-# RunnablePassthrough.map
-# v2 = RunnablePassthrough.assign(
-#     memory=RunnableLambda(memory.load_memory_variables) | itemgetter("history")
-# ) | prompts.initial_prompt | model | StrOutputParser()
 
 repair_chain = LLMChain(
     prompt=prompts.repair_prompt,
     llm=model,
     output_parser=StrOutputParser(),
-    verbose=True,
 )
 
-# Don't provide memory here
-pathcrawler_chain = LLMChain(
-    prompt=prompts.pathcrawler_prompt,
-    llm=model,
-    output_parser=StrOutputParser(),
-    verbose=True,
-)
+pathcrawler_chain = prompt=prompts.pathcrawler_prompt | model | StrOutputParser() | llm_output_parser

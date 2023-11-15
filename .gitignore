@@ -2,5 +2,5 @@ scratch_programs/
 output/
 examples/
 temp_files/
-src/__pycache__/
+__pycache__/
 troubleshoot.c

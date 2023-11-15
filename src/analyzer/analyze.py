@@ -4,7 +4,7 @@ from exceptions import (
     RepairException,
     PathcrawlerException,
 )
-from chains import acsl_generation_chain, pathcrawler_chain
+from chains import acsl_generation_chain, pathcrawler_chain 
 from repair import repair
 from pathcrawler import run_pathcrawler
 from annotation_evaluator import AnnotationEvaluator
@@ -27,8 +27,7 @@ def generate_acsl(
         print("generating ACSL annotations...")
         # First we generate 5 initial attempts to try and find a good starting point
         initial_generations = [
-            acsl_generation_chain.invoke({"program": content}).get("text")
-            for _ in range(5)
+            acsl_generation_chain.invoke({"program": content}) for _ in range(5)
         ]
         initial_generations = [x for x in initial_generations if x is not None]
     except Exception as e:
@@ -38,19 +37,27 @@ def generate_acsl(
     try:
         # Then we evaluate the initial attempts and pick the best one
         evalulator = AnnotationEvaluator()
+        
         ranked_results = list(
             map(
-                lambda x: evalulator.evaluate_strings(prediction=x), initial_generations
+                lambda x: evalulator.evaluate_strings(
+                    prediction=x[0], classification_counts=x[1]
+                ),
+                initial_generations,
             )
         )
         # Output the initial attempts to files
         for idx, candidate in enumerate(ranked_results):
-            outputter.output_candidate(candidate, idx)
+            outputter.output_candidate(candidate=candidate, idx=idx)
 
         # Pick the best one
         choice = max(ranked_results, key=lambda x: x["rank"])
-        outputter.output_candidate(choice, -1, True)
-        most_recent_program = choice["program"]
+        outputter.output_candidate(candidate=choice, idx=-1, is_choice=True)
+        choice_program = choice["program"]
+
+        # see how much we proved with our repaired program
+        outputter.set_wp_results(choice_program, "initial")
+
     except Exception as e:
         outputter.output_exception(HeuristicException(e))
         return
@@ -58,7 +65,7 @@ def generate_acsl(
     try:
         # First round of repairs
         print("validating...")
-        most_recent_program = repair(most_recent_program, outputter, "initial acsl")
+        repaired_choice_program = repair(choice_program, outputter, "initial acsl")
     except Exception as e:
         outputter.output_exception(HeuristicException(e))
         return
@@ -66,7 +73,7 @@ def generate_acsl(
     try:
         # Generate pathcrawler csv to use as context
         print("generating pathcrawler output...")
-        csv = run_pathcrawler(most_recent_program, main_function, oracle_file)
+        csv = run_pathcrawler(repaired_choice_program, main_function, oracle_file)
         outputter.output_pathcrawler_csv(csv)
     except Exception as e:
         outputter.output_exception(PathcrawlerException(e))
@@ -79,31 +86,33 @@ def generate_acsl(
             with open(program_file) as oracle_content:
                 oracle_text = oracle_content.read()
 
-        res = pathcrawler_chain.invoke(
-            {"csv": csv, "program": most_recent_program, "oracle": oracle_text}
+        pathcrawler_program , pathcrawler_classifications = pathcrawler_chain.invoke(
+            {"csv": csv, "program": repaired_choice_program, "oracle": oracle_text}
         )
-        most_recent_program = res.get("text")
-        outputter.output_pathcrawler_program(most_recent_program)
+        outputter.output_pathcrawler_program(pathcrawler_program, pathcrawler_classifications)
     except Exception as e:
         outputter.output_exception(PathcrawlerException(e))
         return
 
     try:
         print("validating...")
-        most_recent_program = repair(
-            most_recent_program, outputter, "with pathcrawler context"
+        repaired_pathcrawler_program = repair(
+            pathcrawler_program, outputter, "with pathcrawler context"
         )
+        outputter.set_wp_results(repaired_pathcrawler_program, "pathcrawler")
     except Exception as e:
         outputter.output_exception(RepairException(e))
         return
 
-    outputter.output_final(most_recent_program)
+    outputter.output_final(repaired_pathcrawler_program)
 
 
 if __name__ == "__main__":
+    name = "Bsearch"
     generate_acsl(
-        "Sample",
-        "programs/pathcrawler_tests/Tritype/f.c",
-        "testme",
-        "programs/pathcrawler_tests/Tritype/OtherCfiles/oracle_testme.c",
+        program_suite="pathcrawler_tests",
+        program_name=name,
+        program_file=f"programs/pathcrawler_tests/{name}/f.c",
+        main_function="testme",
+        oracle_file=f"programs/pathcrawler_tests/{name}/OtherCfiles/oracle_testme.c",
     )

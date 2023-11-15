@@ -1,6 +1,7 @@
 import difflib
 import os
-from sanitize import extract_classification_count
+from sanitize import extract_c_program, extract_classification_count
+from wp import exec_wp, extract_proofs_and_goals
 
 
 class Outputter:
@@ -14,10 +15,10 @@ class Outputter:
         self.unit = False
         self.suite = suite
 
-    def output_candidate(self, choice: dict, idx: int, is_choice=False):
-        program = choice.get("program")
-        score = choice.get("rank")
-        classification_counts = choice.get("classifications")
+    def output_candidate(self, candidate: dict, idx: int, is_choice=False):
+        program = candidate.get("program")
+        score = candidate.get("rank")
+        classification_counts = candidate.get("classifications")
         content = f"""Score: {score}
     
 Program:
@@ -28,6 +29,7 @@ Program:
 Classification Counts:
 {classification_counts}"""
         output_file = f"{self.directory}/candidate_{idx}.txt"
+
         if is_choice:
             output_file = f"{self.directory}/choice.txt"
             self.choice_classifications = classification_counts
@@ -36,6 +38,8 @@ Classification Counts:
         self.current_program = program
 
     def output_repair(self, repaired_program: str):
+        if self.current_program is None:
+            raise Exception("program not set")
         diff = list(
             difflib.ndiff(
                 self.current_program.splitlines(), repaired_program.splitlines()
@@ -54,19 +58,20 @@ Classification Counts:
             )
 
     def output_final(self, final_program: str):
-        with open(f"output/{self.name}/final.txt", "w") as file:
+        with open(f"output/{self.name}/final.c", "w") as file:
             file.write(final_program)
+        self.output_results()
 
     def output_pathcrawler_csv(self, csv: str):
         with open(f"{self.directory}/pathcrawler.csv", "w") as file:
             file.write(csv)
 
-    def output_pathcrawler_program(self, program: str):
-        self.pathcrawler_classification = extract_classification_count(program)
+    def output_pathcrawler_program(self, program: str, classification_counts: dict):
+        self.pathcrawler_classification = classification_counts
         with open(f"{self.directory}/pathcrawler.txt", "w") as file:
             file.write(program)
 
-    def get_classification_difference(self, dict_a: dict, dict_b: dict):
+    def get_classification_difference(self, dict_a , dict_b):
         result = {}
 
         # Get all unique keys from both dictionaries
@@ -81,6 +86,18 @@ Classification Counts:
             result[key] = b_val - a_val
         return result
 
+    def set_wp_results(self, program: str, stage: str):
+        wp_output = exec_wp(program)
+        if wp_output.returncode != 0:
+            raise Exception(f"Failed to set WP results for {stage}")
+        proved, goals = extract_proofs_and_goals(wp_output.stdout)
+        if stage == "initial":
+            self.choice_proved = proved
+            self.choice_goals = goals
+        elif stage == "pathcrawler":
+            self.pathcrawler_proved = proved
+            self.pathcrawler_goals = goals
+
     def output_results(self):
         pathcrawler_additions = self.get_classification_difference(
             self.choice_classifications, self.pathcrawler_classification
@@ -91,6 +108,10 @@ Classification Counts:
             "oracle": self.oracle,
             "unit": self.unit,
             "suite": self.suite,
+            "initial_proved": self.choice_proved,
+            "initial_goals": self.choice_goals,
+            "pathcrawler_proved": self.pathcrawler_proved,
+            "pathcrawler_goals": self.pathcrawler_goals,
         }
 
         with open(f"{self.directory}/results.txt", "w") as file:
