@@ -1,5 +1,5 @@
 import argparse
-from harnesses.pathcrawler import PathCrawlerHarness
+from src.harnesses.pathcrawler_harness import PathCrawlerHarness
 
 def main(args):
     # Your main function logic goes here

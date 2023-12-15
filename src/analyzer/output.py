@@ -1,17 +1,19 @@
 import difflib
 import os
-from sanitize import extract_c_program, extract_classification_count
-from wp import exec_wp, extract_proofs_and_goals
+from .wp import exec_wp, extract_proofs_and_goals
 
 
 class Outputter:
-    def __init__(self, name, suite):
+    def __init__(self, name, suite, oracle_file):
         self.name = name
         self.directory = f"output/{self.name}"
         os.makedirs(self.directory, exist_ok=True)
         self.repair_counter = 0
 
-        self.oracle = False
+        if oracle_file is not None:
+            self.oracle = True
+        else:
+            self.oracle = False
         self.unit = False
         self.suite = suite
 
@@ -86,17 +88,23 @@ Classification Counts:
             result[key] = b_val - a_val
         return result
 
-    def set_wp_results(self, program: str, stage: str):
-        wp_output = exec_wp(program)
+    def set_initial_wp_results(self, program: str, headers_path):
+        wp_output = exec_wp(annotated_program=program, headers_path=headers_path)
         if wp_output.returncode != 0:
-            raise Exception(f"Failed to set WP results for {stage}")
+            raise Exception("Failed to set initial WP results")
         proved, goals = extract_proofs_and_goals(wp_output.stdout)
-        if stage == "initial":
-            self.choice_proved = proved
-            self.choice_goals = goals
-        elif stage == "pathcrawler":
-            self.pathcrawler_proved = proved
-            self.pathcrawler_goals = goals
+        self.choice_proved = proved
+        self.choice_goals = goals
+
+    def set_pathcrawler_wp_results(self, program: str, headers_path):
+        wp_output = exec_wp(annotated_program=program, headers_path=headers_path)
+        if wp_output.returncode != 0:
+            raise Exception("Failed to set pathcrawler WP results")
+        proved, goals = extract_proofs_and_goals(wp_output.stdout)
+        self.pathcrawler_proved = proved
+        self.pathcrawler_goals = goals
+
+
 
     def output_results(self):
         pathcrawler_additions = self.get_classification_difference(

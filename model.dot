@@ -1,0 +1,36 @@
+digraph G {
+    // Global settings
+    graph [fontname = "Helvetica", fontsize = 10];
+    node [fontname = "Helvetica", fontsize = 10];
+    edge [fontname = "Helvetica", fontsize = 10];
+
+    // Subgraph for the Repair loop
+    subgraph cluster_0 {
+        style = filled;
+        color = lightblue;
+        node [style = filled, color = white, shape = box];
+        label = "Repair loop";
+
+        "ask LLM to repair" -> "run WP";
+        "run WP" -> "repair valid?";
+        "repair valid?" -> "ask LLM to repair" [label = "WP output", color = red];
+        "repair valid?" -> "repair finished";
+    }
+
+    // Nodes and edges for the initial program flow
+    "initial program" -> "initial generations" [color = green];
+    "initial generations" -> "choose candidate"
+    "choose candidate" -> "repair1"
+    "repair1" -> "run pathcrawler";
+
+    // Nodes and edges for the pathcrawler section
+    "run pathcrawler" -> "generation with pathcrawler";
+    "generation with pathcrawler" -> "repair2";
+    "repair2" -> "has unit tests?" [style = dashed];
+
+    // Nodes and edges for the unit test section
+    "has unit tests?" -> "generation with unit tests" [style = bold, color = blue];
+    "has unit tests?" -> "end" [style = bold, color = orange];
+    "generation with unit tests" -> "repair3";
+    "repair3" -> "end" [color = orange];
+}

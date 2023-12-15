@@ -4,7 +4,7 @@ import subprocess
 import tempfile
 
 
-def exec_wp(annotated_program: str):
+def exec_wp(annotated_program: str, headers_path: str):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".c", mode="w") as tmp_file:
         tmp_file.write(annotated_program)
         tmp_file_name = tmp_file.name
@@ -14,6 +14,9 @@ def exec_wp(annotated_program: str):
         "-wp-rte",
         "-wp-prover",
         "Alt-Ergo,Z3",
+        "-no-cpp-frama-c-compliant",
+        "-cpp-command",
+        f"gcc -E -I {headers_path}",
         "-wp-timeout",
         "10",
         tmp_file_name,

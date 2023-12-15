@@ -1,5 +1,4 @@
-from sanitize import extract_c_program, extract_classification_count
-from wp import exec_wp, extract_proof_count_score, extract_proofs_and_goals
+from .wp import exec_wp, extract_proof_count_score, extract_proofs_and_goals
 from langchain.evaluation.schema import StringEvaluator
 from typing import Any, Optional
 
@@ -19,7 +18,8 @@ class AnnotationEvaluator(StringEvaluator):
     ) -> dict:
         program = prediction
         classification_counts = kwargs.get("classification_counts", {})
-        score = self.rank(program, classification_counts)
+        headers_path = kwargs.get("headers_path", {})
+        score = self.rank(program, classification_counts, headers_path)
         proved, goals = extract_proofs_and_goals(self.wp_result.stdout)
 
         return {
@@ -30,7 +30,7 @@ class AnnotationEvaluator(StringEvaluator):
             "goals": goals,
         }
 
-    def rank(self, program: str, classification_counts: dict):
+    def rank(self, program: str, classification_counts: dict, headers_path: str):
         """
         ranks an annotated program with a value from 0 to 1
         scoring is based on the following criteria:
@@ -50,7 +50,7 @@ class AnnotationEvaluator(StringEvaluator):
 
         """
         try:
-            self.wp_result = exec_wp(program)
+            self.wp_result = exec_wp(annotated_program=program, headers_path=headers_path)
             if self.wp_result.returncode != 0:
                 wp_score = 0
             else:

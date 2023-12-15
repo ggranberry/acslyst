@@ -2,7 +2,7 @@ from langchain.prompts import PromptTemplate
 
 initial_prompt = PromptTemplate.from_template(
     """
-You are a LLM that takes in a C program and returns an annotated C program. Find any non-redundant properties for the program and generate ACSL annotations (from the Frama-C framework). Annotate the program with the ACSL annotations that you find and return the annotated program. Returning a program with no annotation is not a valid solution. An annotation followed by another annotation should always be put into a block.
+You are a LLM that takes in a C program and returns an annotated C program. Find any non-redundant properties for the program and generate ACSL annotations (from the Frama-C framework). Annotate the program with the ACSL annotations that you find and return the annotated program. Returning a program with no annotation is not a valid solution. An annotation followed by another annotation should always be put into a block. Do not edit the C code. Only add annotations.
 
 ANNOTATION EXAMPLES:
 
@@ -53,7 +53,7 @@ START OF INPUT:
 )
 
 
-repair_template = """You are an LLM that only returns code. You are attempting to fix invalid ACSL annotations that were previously added to a C program. You are also provided output from Frama-C's WP tool which describes a syntax error in the previously generated annotations. Use the output from Frama-C's WP tool to guide you in repairing the syntax errors in the annotations. Returning a program with no annotations is not a valid solution. Returning a program with no changes to the annotations it not a valid solution.
+repair_template = """You are an LLM that only returns code. You are attempting to fix invalid ACSL annotations that were previously added to a C program. You are also provided output from Frama-C's WP tool which describes a syntax error in the previously generated annotations. Use the output from Frama-C's WP tool to guide you in repairing the syntax errors in the annotations. Returning a program with no annotations is not a valid solution. Returning a program with no changes to the annotations it not a valid solution. Do not edit the C code. Only edit the annotations.
 
 FORMAT INSTRUCTIONS:
 
@@ -74,7 +74,8 @@ repair_prompt = PromptTemplate(
     input_variables=["program", "wp"], template=repair_template
 )
 
-pathcrawler_template = """You are an LLM that only returns annotated code. You receive an existing C program that was annotated with with ACSL. Additionally you receive a CSV string which represents the output of Frama-C's PathCrawler tool on the provided program. If the verdict column contains the value "unknown", this means that an oracle hasn't been provided to classify the output. If an oracle was provided, it will also be provided as context. Use these inputs to modify the existing ACSL annotations if it seems helpful in understanding the program. Returning a program with no annotations is not a valid solution. Returning a program with no changes is a valid solution, but I want you to prioritize modifications.
+pathcrawler_template = """You are an LLM that only returns annotated code. You receive an existing C program that was annotated with with ACSL. Additionally you receive a CSV string which represents the output of Frama-C's PathCrawler tool on the provided program. If the verdict column contains the value "unknown", this means that an oracle hasn't been provided to classify the output. If an oracle was provided, it will also be provided as context. Use these inputs to modify the existing ACSL annotations if it seems helpful in understanding the program. Returning a program with no annotations is not a valid solution. Returning a program with no changes is a valid solution, but I want you to prioritize modifications. Do not edit the C code. Only edit the annotations.
+
 
 FORMAT INSTRUCTIONS:
 
