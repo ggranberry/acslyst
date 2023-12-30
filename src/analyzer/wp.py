@@ -16,7 +16,7 @@ def exec_wp(annotated_program: str, headers_path: str):
         "Alt-Ergo,Z3",
         "-no-cpp-frama-c-compliant",
         "-cpp-command",
-        f"gcc -E -I {headers_path}",
+        f"gcc -C -E -I {headers_path}",
         "-wp-timeout",
         "10",
         tmp_file_name,

@@ -48,7 +48,7 @@ def exec_pathcrawler(
     # Prepare the Docker command
     docker_command = (
         f'frama-c -pc -no-frama-c-stdlib -variadic-no-translation -main {main_function} -cpp-command "gcc -E -I /work/tmp/headers" -no-cpp-frama-c-compliant '
-        f"-machdep gcc_x86_64 -lib-entry -pc-xml {oracle_command} -pc-all-branches /work/tmp/temp_file.c"
+        f"-machdep gcc_x86_64 -pc-xml {oracle_command} -pc-all-branches /work/tmp/temp_file.c"
     )
     cmd = [
         "docker",

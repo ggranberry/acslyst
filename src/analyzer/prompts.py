@@ -108,3 +108,85 @@ Oracle (if provided):
 pathcrawler_prompt = PromptTemplate(
     input_variables=["program", "csv"], template=pathcrawler_template
 )
+
+parameters_template = """You are an LLM that edits prolog files. You are given
+- a c program annotated with ACSL
+- a prolog file used to generate input parameters for a c program
+
+Steps:
+    1. Identify the preconditions defined in the ACSL annotations of the c program. 
+        a. They are defined as "requires" clauses (e.g. /*@ requires x > 0 */)
+        b. List dimensions are defined with the "valid" keyword clauses (e.g. /*@ requires \\valid(x+10 */)
+        c. Quantified expressions are defined with the "forall" keyword clauses (e.g. /*@ requires \\forall int i; 0 <= i < 10 ==> x[i] > 0 */)
+
+    2. Edit the prolog file to generate input parameters that satisfy the preconditions defined in the ACSL annotations of the c program
+        a. For list variable instantiations, make sure that the dimension is big enough (e.g. create_input_val(dim('tab'),int([0..9]),Ins) will create a list of size up to 10)
+        b. To create unquanfified expressions, use the "unquantif_preconds" function like below  which assures that the list called tab is at least size 3 and also larger than x and y
+            unquantif_preconds('testme', [
+                c(supegal, dim('tab'),3,  pre),
+                c(supegal, dim('tab'), 'x', pre),
+                c(supegal, dim('tab'), 'y', pre)
+            ]).
+        c. To create quantified expressions, use the "quantif_preconds" function like below which specifies that for all indicies greater than or equal to 1, the value at index I is greater than the value at index I - 1
+            quantif_preconds('testme', 
+                [Index],[c(supegal,Index,1,pre)],
+                supegal,
+                e('tab',I),
+                e('tab',I – 1)),
+                pre)
+            ]).
+        d. The conditional operators are as fallows: inf|infegal|sup|supegal|egal|diff 
+
+FORMAT INSTRUCTIONS:
+
+Return the annotated prolog code wrapped in markdown
+```prolog
+...
+```
+
+START OF INPUT:
+
+C PROGRAM:
+{program}
+
+PARAMETERS FILE:
+{parameters}"""
+
+parameters_prompt = PromptTemplate(
+    input_variables=["program", "parameters"], template=parameters_template
+)
+
+preconditions_template = """You are an LLM that edits C program files. You are given the following
+- a c program possibly anootated with ACSL
+- a prolog file used to generate input parameters for a c program
+
+Steps:
+    1. Analyze the inputs and preconditions defined in the prolog file
+        a. Pay specific attention to domains and qualified/unqualified preconditions
+        b. create variable statements such as "create_input_val('n',int([2..4]),Ins)" should not be treated as preconditions, but they might be instructive in understanding the program.
+    2. Edit the C program to include ACSL preconditions
+        a. Your main goal is to set sensible preconditions for the program
+        b. The prolog file should be used as a guide to help you understand the program, but not the source of truth for preconditions
+
+FORMAT INSTRUCTIONS:
+
+Return the annotated c code wrapped in markdown
+```c
+...
+```
+
+START OF INPUT:
+
+C PROGRAM:
+```c
+{program}
+```
+
+PARAMETERS FILE:
+```prolog
+{parameters}
+```"""
+
+preconditions_prompt = PromptTemplate(
+    input_variables=["program", "parameters"], template=preconditions_template
+)

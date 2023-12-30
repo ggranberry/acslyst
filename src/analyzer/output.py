@@ -1,12 +1,14 @@
 import difflib
 import os
+import datetime
 from .wp import exec_wp, extract_proofs_and_goals
 
 
 class Outputter:
-    def __init__(self, name, suite, oracle_file):
+    def __init__(self, name, suite, oracle_file, unit_test_file):
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.name = name
-        self.directory = f"output/{self.name}"
+        self.directory = f"output/timestamp/{self.name}"
         os.makedirs(self.directory, exist_ok=True)
         self.repair_counter = 0
 
@@ -14,7 +16,12 @@ class Outputter:
             self.oracle = True
         else:
             self.oracle = False
-        self.unit = False
+
+        if unit_test_file is not None:
+            self.unit = True
+        else:
+            self.unit = False
+
         self.suite = suite
 
     def output_candidate(self, candidate: dict, idx: int, is_choice=False):
@@ -73,7 +80,7 @@ Classification Counts:
         with open(f"{self.directory}/pathcrawler.txt", "w") as file:
             file.write(program)
 
-    def get_classification_difference(self, dict_a , dict_b):
+    def get_classification_difference(self, dict_a, dict_b):
         result = {}
 
         # Get all unique keys from both dictionaries
@@ -103,8 +110,6 @@ Classification Counts:
         proved, goals = extract_proofs_and_goals(wp_output.stdout)
         self.pathcrawler_proved = proved
         self.pathcrawler_goals = goals
-
-
 
     def output_results(self):
         pathcrawler_additions = self.get_classification_difference(

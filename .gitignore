@@ -4,3 +4,6 @@ examples/
 temp_files/
 __pycache__/
 troubleshoot.c
+testcases_*/
+pathcrawler_*/
+*.pl
