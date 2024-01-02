@@ -6,4 +6,10 @@ __pycache__/
 troubleshoot.c
 testcases_*/
 pathcrawler_*/
+programs/
+programs/*
 *.pl
+*.out
+*.i
+*.e-acsl
+
