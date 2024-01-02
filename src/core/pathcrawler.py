@@ -6,12 +6,19 @@ import tempfile
 import shutil
 
 
-def run_pathcrawler(program_str, main_function, oracle_file, headers_dir):
+def run_pathcrawler(
+    program_str, main_function, headers_dir, oracle_file=None, params_file=None
+):
     base_temp_dir = os.path.join(os.getcwd(), "temp_files")
     temp_dir = tempfile.mkdtemp(dir=base_temp_dir)
     try:
         res = exec_pathcrawler(
-            program_str, temp_dir, main_function, oracle_file, headers_dir
+            program_str=program_str,
+            temp_dir=temp_dir,
+            main_function=main_function,
+            headers_dir=headers_dir,
+            oracle_file=oracle_file,
+            params_file=params_file,
         )
         res.check_returncode()
         csv = get_test_cases_csv(f"{temp_dir}/testcases_temp_file/{main_function}/xml")
@@ -20,11 +27,74 @@ def run_pathcrawler(program_str, main_function, oracle_file, headers_dir):
         shutil.rmtree(temp_dir)
 
 
-# So we have so original file path which is formulated outside the container
-# Now that we're in the container, we need to get the path to the file inside the container
+def exec_pathcrawler_analyzer(
+    program_str: str,
+    temp_dir: str,
+    main_function: str,
+    headers_dir: str,
+):
+    temp_file_path = os.path.join(temp_dir, "temp_file.c")
+    with open(temp_file_path, "w") as tmp:
+        tmp.write(program_str)
+
+    # Copy all the files from the headers_dir into the tmp dir
+    for file in glob.glob(headers_dir):
+        shutil.copy(file, temp_dir)
+
+    # TODO IMPLEMENT THIS
 
 
 def exec_pathcrawler(
+    program_str: str,
+    temp_dir: str,
+    main_function: str,
+    headers_dir: str,
+    oracle_file=None,
+    params_file=None,
+):
+    # Write the program to a temporary file
+    temp_file_path = os.path.join(temp_dir, "temp_file.c")
+    with open(temp_file_path, "w") as tmp:
+        tmp.write(program_str)
+
+    # Copy all the files from the headers_dir into the tmp dir
+    for file in glob.glob(headers_dir):
+        shutil.copy(file, temp_dir)
+
+    # If we have an oracle, go ahead and use it
+    if oracle_file is not None:
+        oracle_command = f"-pc-oracle {oracle_file}"
+    else:
+        oracle_command = ""
+
+    # If we are provided a params file, use it
+    if params_file is not None:
+        params_command = f"-pc-test-params {params_file}"
+    else:
+        params_command = ""
+
+    # Prepare the Docker command
+    cmd = [
+        "frama-c",
+        "-pc",
+        "-no-frama-c-stdlib",
+        "-variadic-no-translation",
+        "-main",
+        main_function,
+        "-no-cpp-frama-c-compliant",
+        params_command,
+        "-pc-xml",
+        {oracle_command},
+        "-pc-all-branches",
+        {temp_file_path},
+    ]
+
+    # Run the Docker command
+    result = subprocess.run(cmd, check=True)
+    return result
+
+
+def exec_pathcrawler_docker(
     program_str: str,
     temp_dir: str,
     main_function: str,

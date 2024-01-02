@@ -47,7 +47,7 @@ ensures: 1
  
 START OF INPUT:
 
-```
+```c
 {program}
 ```"""
 )

@@ -1,7 +1,7 @@
 from langchain.chains.llm import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
-import src.analyzer.prompts as prompts
+import src.core.prompts as prompts
 from langchain.schema.output_parser import StrOutputParser
 from .sanitize import llm_output_parser
 
