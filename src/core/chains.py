@@ -36,3 +36,7 @@ precondition_chain = prompt = (
 paramters_chain = prompt = (
     prompts.parameters_prompt | model | StrOutputParser() | llm_output_parser
 )
+
+acsl_generation_pathcrawler_chain= prompt = (
+    prompts.generate_with_pathcrawler_prompt| model | StrOutputParser() | llm_output_parser
+)

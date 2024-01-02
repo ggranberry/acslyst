@@ -17,17 +17,23 @@ class PathCrawlerHarness(Harness):
     def __generate_task(self, directory_path, timestamp):
         program_file = os.path.join(directory_path, "f.c")
         program_name = os.path.basename(os.path.normpath(directory_path))
-        oracle_path = os.path.join(directory_path, "OtherCfiles/oracle_testme.c")
+        oracle_file = os.path.join(directory_path, "OtherCfiles/oracle_testme.c")
+        parameters_file = os.path.join(directory_path, "params.pl")
         headers_path = directory_path
-        if not os.path.exists(oracle_path):
-            oracle_path = None
+
+        if not os.path.exists(oracle_file):
+            oracle_file= None
+        if not os.path.exists(parameters_file):
+            parameters_file= None
+
         return Task(
             program_suite="pathcrawler_tests",
             headers_path=headers_path,
             program_file=program_file,
             program_name=program_name,
             main_function="testme",
-            oracle_path=oracle_path,
+            oracle_file=oracle_file,
             oracle_main="oracle_testme",
+            parameters_file=parameters_file,
             timestamp=timestamp,
         )

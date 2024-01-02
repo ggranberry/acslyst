@@ -24,8 +24,12 @@ class Outputter:
         with open(f"{self.directory}/results.txt", "w") as file:
             file.write(str(results))
 
+    def output_pathcrawler_csv(self, csv: str):
+        with open(f"{self.directory}/pathcrawler.csv", "w") as file:
+            file.write(csv)
+
     def output_exception(self, exception):
-        with open(f"output/{self.name}/error.txt", "w") as file:
+        with open(f"{self.directory}/error.txt", "w") as file:
             file.write(
                 f"\n\nException:\n{exception.message}\n\n{exception.original_exception}"
             )

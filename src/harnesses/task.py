@@ -1,5 +1,3 @@
-import datetime
-
 class Task:
     def __init__(
         self,
@@ -7,10 +5,11 @@ class Task:
         program_name,
         program_file,
         main_function,
-        oracle_path,
+        oracle_file,
         oracle_main,
         headers_path,
         timestamp,
+        parameters_file,
     ):
         self.timestamp = timestamp
         self.program_suite = program_suite
@@ -18,5 +17,6 @@ class Task:
         self.headers_path = headers_path
         self.program_file= program_file 
         self.main_function = main_function
-        self.oracle_path = oracle_path
+        self.oracle_file= oracle_file 
         self.oracle_main = oracle_main
+        self.parameters_file = parameters_file

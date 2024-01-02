@@ -57,21 +57,12 @@ def exec_pathcrawler(
     with open(temp_file_path, "w") as tmp:
         tmp.write(program_str)
 
+    headers_dir_files = os.path.join(headers_dir, "*")
+
     # Copy all the files from the headers_dir into the tmp dir
-    for file in glob.glob(headers_dir):
-        shutil.copy(file, temp_dir)
-
-    # If we have an oracle, go ahead and use it
-    if oracle_file is not None:
-        oracle_command = f"-pc-oracle {oracle_file}"
-    else:
-        oracle_command = ""
-
-    # If we are provided a params file, use it
-    if params_file is not None:
-        params_command = f"-pc-test-params {params_file}"
-    else:
-        params_command = ""
+    for file in glob.glob(headers_dir_files):
+        if(os.path.isfile(file)):
+            shutil.copy(file, temp_dir)
 
     # Prepare the Docker command
     cmd = [
@@ -82,15 +73,25 @@ def exec_pathcrawler(
         "-main",
         main_function,
         "-no-cpp-frama-c-compliant",
-        params_command,
         "-pc-xml",
-        {oracle_command},
         "-pc-all-branches",
-        {temp_file_path},
     ]
 
-    # Run the Docker command
-    result = subprocess.run(cmd, check=True)
+     # Append oracle_command if it's not empty
+    if oracle_file is not None:
+        cmd.append("-pc-oracle")
+        cmd.append(oracle_file)
+
+    # Append params_command if it's not empty
+    if params_file is not None:
+        cmd.append("-pc-test-params")
+        cmd.append(params_file)
+
+    cmd.append(temp_file_path)
+
+
+    result = subprocess.run(cmd, check=False)
+    print(result)
     return result
 
 
@@ -147,6 +148,8 @@ def get_test_cases_csv(directory_path: str):
     Returns a csv string of all test cases in the given path
     """
     xml_files = glob.glob(f"{directory_path}/TC_*.xml")
+    if len(xml_files) == 0:
+        return ""
 
     print(f"Found {len(xml_files)} test cases")
     header = get_csv_header(xml_files[0])

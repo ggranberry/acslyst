@@ -1,6 +1,7 @@
 import argparse
 from src.harnesses.pathcrawler_harness import PathCrawlerHarness
 from src.experiments.count_annotations.count_annotations import count_annotations
+from src.experiments.count_annotations_pathcrawler.count_annotations import count_annotations_pathcrawler
 
 def main(args):
     # Your main function logic goes here
@@ -17,6 +18,8 @@ def main(args):
 
     if args.experiment == "count":
         experiment = count_annotations
+    elif args.experiment == "count_pathcrawler":
+        experiment = count_annotations_pathcrawler
     else:
         raise Exception(f"Invalid experiment name: {args.experiment}")
 
@@ -33,7 +36,7 @@ if __name__ == "__main__":
 
     # Add flags with restrictions
     parser.add_argument('-s', '--suite', nargs='+', required=True, help='Specify the test suites: pathcrawler_tests, formai, svcomp, industrial', choices=["pathcrawler_tests", "formai", "svcomp", "industrial"])
-    parser.add_argument('-e', '--experiment', required=True, help='Specify the experiment: count', choices=["count"])
+    parser.add_argument('-e', '--experiment', required=True, help='Specify the experiment: count, count_pathcrawler', choices=["count", "count_pathcrawler"])
     parser.add_argument('-m', '--model', required=True, help='Specify the model: openai, gemini', choices=["openai", "gemini"])
 
     # Parse arguments

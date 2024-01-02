@@ -106,7 +106,7 @@ Oracle (if provided):
 """
 
 pathcrawler_prompt = PromptTemplate(
-    input_variables=["program", "csv"], template=pathcrawler_template
+    input_variables=["program", "csv", "oracle"], template=pathcrawler_template
 )
 
 parameters_template = """You are an LLM that edits prolog files. You are given
@@ -190,3 +190,72 @@ PARAMETERS FILE:
 preconditions_prompt = PromptTemplate(
     input_variables=["program", "parameters"], template=preconditions_template
 )
+
+
+generate_with_pathcrawler_prompt= PromptTemplate.from_template(
+    """You are a LLM that takes the following inputs and returns a C program annotated with ACSL annotations.
+1. A C program with no ACSL annotations
+2. A CSV file the represents test runs performed by Frama-C pathcrawler
+3. An optional oracle file which is used to provide a verdict for pathcrawler test runs
+
+GOALS:
+1. Analyze both the pathcrawler output as well as the program itself
+2. Find any non-redundant properties for the program and annotate the program with the generated annotations
+3. Returning a program with no annotation is not a valid solution
+4. No not edit the C code, only add annotations
+
+ANNOTATION EXAMPLES:
+
+Example 1 (single annotation):
+/*@ requires low >= 0 && high <= 9; */
+
+Example 2 (multiple annotations):
+/*@ 
+  @ requires low >= 0 && high <= 9;
+  @ requires elem >= 0 && elem <= 9;
+*/
+
+Example 3 (loops)(loop annotations must be placed before a loop and NOT above the function body):
+/*@
+  @ loop invariant low <= high;
+  @ loop variant high - low;
+*/
+while(low <= high) 
+
+Example 4 (loop assigns) (loop assigns must be placed before loop variant):
+/*@
+  @ loop invariant i >= 0 && i <= 3;
+  @ loop assigns fa;
+  @ loop variant 3 - i;
+*/
+while(low <= high) 
+
+FORMAT INSTRUCTIONS:
+
+Return the annotated c code wrapped in markdown
+```c
+...
+```
+
+Additionally count each annoataion type and provide a list which shows how often each type occurred and return the list in the format wrapped in "###Classification". Follow these examples:
+
+###Classification
+requires: 5
+loop invariant: 2
+ensures: 1
+###
+ 
+START OF INPUT:
+
+Program:
+```c
+{program}
+
+PathCrawler Output:
+{csv}
+
+Oracle (if provided):
+{oracle}
+```"""
+)
+
