@@ -36,14 +36,6 @@ Return the annotated c code wrapped in markdown
 ```c
 ...
 ```
-
-Additionally count each annoataion type and provide a list which shows how often each type occurred and return the list in the format wrapped in "###Classification". Follow these examples:
-
-###Classification
-requires: 5
-loop invariant: 2
-ensures: 1
-###
  
 START OF INPUT:
 
@@ -201,7 +193,7 @@ GOALS:
 1. Analyze both the pathcrawler output as well as the program itself
 2. Find any non-redundant properties for the program and annotate the program with the generated annotations
 3. Returning a program with no annotation is not a valid solution
-4. No not edit the C code, only add annotations
+4. Do not edit the C code, only add annotations
 
 ANNOTATION EXAMPLES:
 
@@ -236,14 +228,6 @@ Return the annotated c code wrapped in markdown
 ...
 ```
 
-Additionally count each annoataion type and provide a list which shows how often each type occurred and return the list in the format wrapped in "###Classification". Follow these examples:
-
-###Classification
-requires: 5
-loop invariant: 2
-ensures: 1
-###
- 
 START OF INPUT:
 
 Program:

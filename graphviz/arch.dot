@@ -1,0 +1,70 @@
+digraph G { 
+
+
+
+	frama[style=invis]
+	python[style=invis]
+	langchain[style=invis]
+
+	pathcrawler[shape=rect]
+	wp[shape=rect]
+	eva[shape=rect]
+	llm[shape=rect]
+
+	invisible[style=invis]
+	invisible2[style=invis]
+
+	cli[shape=diamond, style=filled,color=green]
+	output[shape=diamond,style=filled,color=red]
+
+	pathcrawler_tests[shape=folder]
+	formai[shape=folder]
+
+	subgraph cluster_4{
+
+		label=program
+		labeljust="r";
+		invisible;
+
+		subgraph cluster_0 {
+			label="program suites"
+			fontcolor=white
+			color=black;
+			style=filled;
+			formai,pathcrawler_tests[style=filled,color=lightyellow]
+		}
+	
+		subgraph cluster_1 {
+			style=filled;
+			color=lightgrey
+			label="python"
+			labeljust="r";
+			node[style=filled,color=white];
+			width=20;
+			height=1;
+	
+			subgraph cluster_2{
+				style=filled;
+				color=white;
+				labeljust="r";
+				llm[style=filled,color=black,style=filled,fontcolor=white]
+				label="langchain"
+				llm
+			}
+	
+			subgraph cluster_3 {
+				style=filled;
+				color=orange
+				label="frama-c"
+				labeljust="r";
+				wp,eva,pathcrawler[style=filled,color=blue,fontcolor=white]
+			}
+		}
+		invisible2;
+	}
+
+	cli->invisible[lhead=cluster_4]
+	pathcrawler_tests->pathcrawler[style=invis]
+	wp->invisible2[style=invis]
+	invisible2->output
+}

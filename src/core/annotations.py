@@ -1,37 +1,59 @@
 import re
+import sys
 from collections import Counter
 
 def count_acsl_annotations(c_program):
-    # list of known ACSL annotations
+    # Known annotations
     annotation_types = [
-        'requires', 'ensures', 'assigns', 
-        'loop invariant', 'loop assigns', 'loop variant', 
-        'behavior', 'assumes', 'complete behaviors', 'disjoint behaviors',
+        'loop invariant', 'loop assigns', 'loop variant',
+        'complete behaviors', 'disjoint behaviors',
+        'requires', 'ensures', 'assigns',
+        'behavior', 'assumes',
         'axiom', 'lemma', 'predicate', 'logic',
         'assert', 'ghost', 'typedef', 'variant', 'invariant'
     ]
 
-    # Regular expression patterns
-    annotation_pattern = r'/\*\@(.*?)\@*/'
-    generic_annotation_pattern = r'@\s*([\w\s]+?):'
+    # Build the regular expression pattern for all known annotations
+    known_annotation_pattern = r'@\s*(' + '|'.join(re.escape(at) for at in annotation_types) + r')\b'
 
-    # Find all annotations in the C program
+    # Pattern to find annotation blocks
+    annotation_pattern = r'/\*\@(.*?)\@*/'
+    behavior_pattern = r'behavior\s+\w+\s*:(.*?)@'
+
+    # Find all annotation blocks
     annotations = re.findall(annotation_pattern, c_program, re.DOTALL)
 
-    # Count each type of annotation
     counts = Counter()
     for annotation in annotations:
-        found = False
-        for annotation_type in annotation_types:
-            if annotation_type in annotation:
-                counts[annotation_type] += 1
-                found = True
+        # Count known annotations in the general block
+        found_annotations = re.findall(known_annotation_pattern, annotation)
+        counts.update(found_annotations)
 
-        # If no known type is found, check for unknown types
-        if not found:
-            other_annotations = re.findall(generic_annotation_pattern, annotation)
-            for other in other_annotations:
-                counts["other (" + other.strip() + ")"] += 1
+        # Find and count annotations within behavior blocks
+        behavior_blocks = re.findall(behavior_pattern, annotation, re.DOTALL)
+        for block in behavior_blocks:
+            found_annotations = re.findall(known_annotation_pattern, block)
+            counts.update(found_annotations)
 
-    # Remove zero counts
     return {k: v for k, v in counts.items() if v > 0}
+
+def main(filename):
+    try:
+        with open(filename, 'r') as file:
+            c_program = file.read()
+            counts = count_acsl_annotations(c_program)
+            print(f"ACSL Annotation Counts for {filename}:")
+            for annotation, count in counts.items():
+                print(f"  {annotation}: {count}")
+    except FileNotFoundError:
+        print(f"Error: File '{filename}' not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <filename>")
+        sys.exit(1)
+
+    filename = sys.argv[1]
+    main(filename)

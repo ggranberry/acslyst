@@ -1,0 +1,64 @@
+
+digraph G { 
+	program[shape=Mdiamond,color=green, style=filled];
+	LLM[shape=cube, style=filled, color=blue, fontcolor=white];
+	Candidates[
+		shape=record
+		label = "<f0> candidate 1| <f1> candidate 2| <f2> candidate 3"
+		color=white;
+		fontcolor=white;
+		fillcolor=black;
+		style=filled;
+	];
+	Counts[
+		shape=record
+		label = "<f0> annotation count 1| <f1> annotation count 2| <f2> annotation count 3"
+	];
+	Total[shape=Msquare,label="total annotation count",color=red, style=filled]
+
+	InvisibleNode [style=invis];
+	Note1[shape=plaintext,label="1. Unannotated C program is fed into the LLM"];
+	Note2[shape=plaintext,label="2. The LLM generates N possible sets of ACSL annotations"];
+	Note3[shape=plaintext,label="3. Annotations are classified into categories and counted into dictionaries"];
+	Note4[shape=plaintext,label="4. All N dictionaries are merged"]
+
+	subgraph cluster_0 {
+		style=filled;
+		color=lightgrey
+		label="python"
+		labeljust="r";
+		node[style=filled,color=white];
+		width=20;
+		height=1;
+		Candidates->Counts->Total;
+
+		subgraph cluster_1{
+			style=filled;
+			color=white;
+			labeljust="r";
+			node[style=filled,color=white]
+			{
+				nodesep=0.5;
+				rank=same;
+				LLM->InvisibleNode[style=invis];
+			}
+			label="LangChain"
+		}
+	}
+	
+	subgraph cluster_2 {
+		style=filled;
+		color=lightorange
+		label="Frama-C"
+	}
+
+	program->LLM;
+	program->Note1[style=invis];
+	LLM->Note2[style=invis]
+	LLM -> Candidates;
+	Candidates->Note3[style=invis];
+
+	Note1->Note2[style=invis];
+	Note2->Note3[style=invis];
+	Note3->Note4[style=invis];
+}
