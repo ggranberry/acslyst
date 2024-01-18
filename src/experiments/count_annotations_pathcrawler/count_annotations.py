@@ -42,7 +42,7 @@ def count_annotations_pathcrawler(
         return
 
     try:
-        initial_generations = generations_with_pathcrawler_csv(content,csv, oracle_file)
+        initial_generations = generations_with_pathcrawler_csv(content,csv)
     except Exception as e:
         outputter.output_exception(LLMException(e))
         return
@@ -50,22 +50,16 @@ def count_annotations_pathcrawler(
     outputter.output_results(initial_generations)
 
 
-def generations_with_pathcrawler_csv(program_str, csv, oracle_file):
-    if oracle_file is not None:
-        with open(oracle_file) as file:
-            oracle = file.read()
-    else:
-        oracle = ""
-
+def generations_with_pathcrawler_csv(program_str, csv):
     # First we generate 5 initial attempts to try and find a good starting point
     initial_generations = [
-            acsl_generation_pathcrawler_chain.invoke({"program": program_str, "csv": csv, "oracle": oracle}) for _ in range(3)
+            acsl_generation_pathcrawler_chain.invoke({"program": program_str, "csv": csv}) for _ in range(5)
     ]
     return [x for x in initial_generations if x is not None]
 
 
 if __name__ == "__main__":
-    name = "ADPCM"
+    name = "TestCondCoverage2"
     count_annotations_pathcrawler(
         timestamp=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
         program_suite="pathcrawler_tests",

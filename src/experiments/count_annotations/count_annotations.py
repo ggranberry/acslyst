@@ -31,13 +31,13 @@ def count_annotations(
 def generate_initial(content):
     # First we generate 5 initial attempts to try and find a good starting point
     initial_generations = [
-        acsl_generation_chain.invoke({"program": content}) for _ in range(3)
+        acsl_generation_chain.invoke({"program": content}) for _ in range(5)
     ]
     return [x for x in initial_generations if x is not None]
 
 
 if __name__ == "__main__":
-    name = "Alias3"
+    name = "TestCondCoverage3"
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     count_annotations(
         timestamp=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),

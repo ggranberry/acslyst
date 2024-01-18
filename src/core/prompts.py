@@ -196,7 +196,6 @@ generate_with_pathcrawler_prompt= PromptTemplate.from_template(
     """You are a LLM that takes the following inputs and returns a C program annotated with ACSL annotations.
 1. A C program with no ACSL annotations
 2. A CSV file the represents test runs performed by Frama-C pathcrawler
-3. An optional oracle file which is used to provide a verdict for pathcrawler test runs
 
 GOALS:
 1. Analyze both the pathcrawler output as well as the program itself
@@ -250,12 +249,10 @@ START OF INPUT:
 Program:
 ```c
 {program}
+```
 
 PathCrawler Output:
 {csv}
-
-Oracle (if provided):
-{oracle}
 ```"""
 )
 

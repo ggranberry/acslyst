@@ -15,7 +15,10 @@ def extract_classification_count(text):
     return classifications
 
 def llm_output_parser(llm_output):
+    print(llm_output)
     program = extract_c_program(llm_output)
+    print(program)
     classification_counts = extract_classification_count(llm_output)
+    print(classification_counts)
     return program, classification_counts
 
