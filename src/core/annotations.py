@@ -25,7 +25,8 @@ def count_acsl_annotations(c_program):
             counts['behavior'] += 1  # Increment count for "behavior"
 
         # Split the block into statements based on ';'
-        statements = re.split('; *\n', block)
+        # statements = re.split('; *\n', block)
+        statements = re.split(r';(?:\s*//.*)? *\n', block)
         for statement in statements:
             # Extract the first keyword from each statement
             match = re.search(r'\b(' + '|'.join(re.escape(at) for at in annotation_types) + r')\b', statement)
