@@ -31,7 +31,7 @@ def count_annotations(
 def generate_initial(content):
     # First we generate 5 initial attempts to try and find a good starting point
     initial_generations = [
-        acsl_generation_chain.invoke({"program": content}) for _ in range(5)
+        acsl_generation_chain.invoke({"program": content}) for _ in range(3)
     ]
     return [x for x in initial_generations if x is not None]
 

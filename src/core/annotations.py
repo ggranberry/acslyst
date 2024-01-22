@@ -3,37 +3,34 @@ import sys
 from collections import Counter
 
 def count_acsl_annotations(c_program):
-    # Known annotations
+    # Known annotations - behaviors are handled differently
     annotation_types = [
         'loop invariant', 'loop assigns', 'loop variant',
         'complete behaviors', 'disjoint behaviors',
-        'requires', 'ensures', 'assigns',
-        'behavior', 'assumes',
+        'requires', 'ensures', 'assigns', 'assumes',
         'axiom', 'lemma', 'predicate', 'logic',
         'assert', 'ghost', 'typedef', 'variant', 'invariant'
     ]
 
-    # Build the regular expression pattern for all known annotations
-    known_annotation_pattern = r'@\s*(' + '|'.join(re.escape(at) for at in annotation_types) + r')\b'
-
-    # Pattern to find annotation blocks
-    annotation_pattern = r'/\*\@(.*?)\@*/'
-    behavior_pattern = r'behavior\s+\w+\s*:(.*?)@'
+    annotation_block_pattern = r'/\*\@(.*?)\*/'
 
     # Find all annotation blocks
-    annotations = re.findall(annotation_pattern, c_program, re.DOTALL)
+    annotation_blocks = re.findall(annotation_block_pattern, c_program, re.DOTALL)
 
     counts = Counter()
-    for annotation in annotations:
-        # Count known annotations in the general block
-        found_annotations = re.findall(known_annotation_pattern, annotation)
-        counts.update(found_annotations)
+    for block in annotation_blocks:
+        # Extract and count behavior lines
+        behavior_lines = re.findall(r'behavior\s+\w+\s*: *\n', block)
+        for _ in behavior_lines:
+            counts['behavior'] += 1  # Increment count for "behavior"
 
-        # Find and count annotations within behavior blocks
-        behavior_blocks = re.findall(behavior_pattern, annotation, re.DOTALL)
-        for block in behavior_blocks:
-            found_annotations = re.findall(known_annotation_pattern, block)
-            counts.update(found_annotations)
+        # Split the block into statements based on ';'
+        statements = re.split('; *\n', block)
+        for statement in statements:
+            # Extract the first keyword from each statement
+            match = re.search(r'\b(' + '|'.join(re.escape(at) for at in annotation_types) + r')\b', statement)
+            if match:
+                counts[match.group(1)] += 1
 
     return {k: v for k, v in counts.items() if v > 0}
 

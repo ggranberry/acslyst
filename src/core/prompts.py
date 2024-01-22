@@ -1,8 +1,14 @@
 from langchain.prompts import PromptTemplate
 
 initial_prompt = PromptTemplate.from_template(
-    """
-You are a LLM that takes in a C program and returns an annotated C program. Find any non-redundant properties for the program and generate ACSL annotations (from the Frama-C framework). Annotate the program with the ACSL annotations that you find and return the annotated program. Returning a program with no annotation is not a valid solution. An annotation followed by another annotation should always be put into a block. Do not edit the C code. Only add annotations.
+    """You are a LLM that takes the following inputs and returns a C program annotated with ACSL annotations.
+1. A C program with no ACSL annotations
+
+GOALS:
+1. Describe any abstract properties that could be represented as ACSL annotations
+2. Generate ACSL annotations based on your analysis of the program
+3. Returning a program with no annotation is not a valid solution
+4. Do not edit the C code, only add annotations
 
 ANNOTATION EXAMPLES:
 
@@ -187,13 +193,14 @@ preconditions_prompt = PromptTemplate(
 generate_with_pathcrawler_prompt= PromptTemplate.from_template(
     """You are a LLM that takes the following inputs and returns a C program annotated with ACSL annotations.
 1. A C program with no ACSL annotations
-2. A CSV file the represents test runs performed by Frama-C pathcrawler
+2. A possibly empty CSV file that represents test runs performed by Frama-C pathcrawler
 
 GOALS:
-1. Analyze both the pathcrawler output as well as the program itself
-2. Find any non-redundant properties for the program and annotate the program with the generated annotations
-3. Returning a program with no annotation is not a valid solution
-4. Do not edit the C code, only add annotations
+1. Analyze the pathcrawler CSV and describe any patterns that you see that could help you understand the behaviors of the program based on given input/output pairs
+2. Describe how these behaviors could be used into creating ACSL annotations
+3. Generate ACSL annotations based on your analysis of the program and take special account of the properties described when analyzing the Pathcrawler CSV file
+4. Returning a program with no annotation is not a valid solution
+5. Do not edit the C code, only add annotations
 
 ANNOTATION EXAMPLES:
 

@@ -17,6 +17,7 @@ class Outputter:
                 file.write(program_str)
 
         classification_counts = [elem[1] for elem in generations]
+        print("classification_counts: ", classification_counts)
         combined_dict = sum((Counter(d) for d in classification_counts), Counter())
 
         results = {"suite": self.suite, "program": self.name, "counts": combined_dict}

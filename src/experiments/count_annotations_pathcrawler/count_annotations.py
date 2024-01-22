@@ -53,13 +53,13 @@ def count_annotations_pathcrawler(
 def generations_with_pathcrawler_csv(program_str, csv):
     # First we generate 5 initial attempts to try and find a good starting point
     initial_generations = [
-            acsl_generation_pathcrawler_chain.invoke({"program": program_str, "csv": csv}) for _ in range(5)
+            acsl_generation_pathcrawler_chain.invoke({"program": program_str, "csv": csv}) for _ in range(3)
     ]
     return [x for x in initial_generations if x is not None]
 
 
 if __name__ == "__main__":
-    name = "TestCondCoverage2"
+    name = "Heat"
     count_annotations_pathcrawler(
         timestamp=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
         program_suite="pathcrawler_tests",
