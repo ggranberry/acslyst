@@ -88,3 +88,21 @@ class PathcrawlerException(Exception):
         super().__init__(
             f"{self.message}: {str(original_exception)}"
         )  # Include original exception message
+
+class EvaException(Exception):
+    """Exception raised when there is an issue dealing with Frama-C's Eva
+
+    Attributes:
+        message -- explanation of the error
+        original_exception -- the original exception that caused this custom error to be raised
+    """
+
+    def __init__(
+        self,
+        original_exception=None,
+    ):
+        self.message = "An error has occured when executing Eva"
+        self.original_exception = original_exception
+        super().__init__(
+            f"{self.message}: {str(original_exception)}"
+        )
