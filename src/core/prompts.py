@@ -85,7 +85,12 @@ Steps:
 
 2. Edit the prolog file to generate input parameters that satisfy the preconditions defined in the ACSL annotations of the c program
     a. For list variable instantiations, make sure that the dimension is big enough (e.g. create_input_val(dim('tab'),int([0..9]),Ins) will create a list of size up to 10)
-    b. Don't use integer values that are too large or too small. For example use the dimensions [0..99] rather than [-2147483648..2147483647]
+    b. In create_input_vals blocks, Don't use integer values above 100 or below -100 for example the following is what we want:
+        
+        create_input_vals('testme',Ins):-
+            create_input_val('x',int([-100..100]),Ins),
+            true.
+
     c. Don't try to perform arithmetic or comparisons in the variable instantitiations. Instead create a quantified/unquantified condition if you need to
     d. To create unquanfified expressions, use the "unquantif_preconds" function like below  which assures that the list called tab is at least size 3 and also larger than x and y
         unquantif_preconds('testme', [

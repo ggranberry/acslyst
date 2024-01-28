@@ -55,12 +55,12 @@ def generations_with_eva(program_str, report):
 
 
 if __name__ == "__main__":
-    name = "BugKpath"
+    name = "FibonacciRecurLimit"
     count_annotations_eva(
         timestamp=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
         program_suite="pathcrawler_tests",
         program_name=name,
         program_file=f"programs/pathcrawler_tests/{name}/f.c",
-        headers_dir=f"programs/pathcrawler_tests/{name}/",
+        headers_path=f"programs/pathcrawler_tests/{name}/",
         main_function="testme",
     )

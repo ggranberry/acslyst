@@ -23,6 +23,10 @@ def evaluate_annotations_pathcrawler(
     annotated_programs_output_dir: str,  # this is some directory where we put annotated programs
     oracle_file=None,
 ):
+    # skip_programs = ["ADPCM1", "AssertAssume", "BugKpath", "DatesBranches", "FloatTritypeLabels", "Interp", "MergePrecond", "MergeWithBreaks", "Struct", "Test_ptr_out", "TestCondCoverage1", "TestCondCoverage3", "BsearchPrecond", "LabelsTcas", "MutualRecursion", "PointeurFonction", "Tritype", "VariableDimArray2", "Luhn", "Alias3", "Alias5", "BsearchPrecond", "IntTritypeLabels", "Luhn", "Merge", "PointeurFonction1", "PointeurFonction5", "Sample", "TestCondCoverage2", "VariableDimArray1", "MutualRecursionNoRecurLimit", "Alias1", "Alias2", "Alias4", "ApacheBranches", "Bsearch", "BsearchPrecond1", "Bsort", "EchoBranches", "ExNikoWCET", "ExSysC", "Heat", "Heat1", "LabelsTriTy", "MultiDimArray", "PointeurFonction2", "PointeurFonction4", "Tcas"]
+    skip_programs= ["MututalRecursionNoRecurLimit", "ADPCM1", "AssertAssume", "BsearchPrecond", "BsearchPrecond1", "BugKpath", "DatesBranches", "FloatTritypeLabels", "Interp", "IntTritypeLabels", "LabelsTcas", "MergePrecond", "MutualRecursion", "MergeWithBreaks", "PointeurFonction1", "PointeurFonction5", "Struct", "Test_ptr_out", "TestCondCoverage1", "TestCondCoverage3", "Tritype", "VariableDimArray2", "Luhn", "Alias1", "Alias2", "Alias3", "Alias4", "Alias5", "ApacheBranches", "Bsearch", "Bsort", "EchoBranches", "ExNikoWCET", "ExSysC", "Heat", "Heat1", "LabelsTriTyp", "Merge", "MultiDimArray", "MutualRecursionNoRecurLimit", "PointeurFonction2", "PointeurFonction4", "Sample", "Tcas", "TestCondCoverage2", "VariableDimArray1"]
+    if program_name in skip_programs:
+        return
     outputter = Outputter(program_name, program_suite, timestamp)
 
     # Take in a folder that has our programs with ACSL generations
@@ -121,7 +125,7 @@ def run_pathcrawler_generator(
 
 
 if __name__ == "__main__":
-    name = "Struct"
+    name = "MutualRecursionNoRecurLimit"
     evaluate_annotations_pathcrawler(
         annotated_programs_output_dir="output/count_annotations_eva/backup_first_run",
         timestamp=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),

@@ -25,6 +25,9 @@ def run_pathcrawler(
     # TODO this is a bit of a hack in that we don't want to run analysis on the annotated program. So we'll just run it on the original
     tmp_file_path = os.path.join(temp_dir, "f.c")
 
+    if precond_file_name is not None:
+        params_file = os.path.join(temp_dir, precond_file_name)
+
     try:
         res = exec_pathcrawler(
             main_function=main_function,
@@ -62,7 +65,7 @@ def run_pathcrawler_analyzer(
             main_function,
             temp_file_path,
         ]
-        res = subprocess.run(cmd, check=False)
+        res = subprocess.run(cmd, check=False, stdout=subprocess.DEVNULL)
         res.check_returncode()
 
         analysis_dir_name = f"pathcrawler_f"
@@ -106,7 +109,7 @@ def exec_pathcrawler(
 
     cmd.append(tmp_file_path)
 
-    result = subprocess.run(cmd, check=False)
+    result = subprocess.run(cmd, check=False, stdout=subprocess.DEVNULL)
     return result
 
 

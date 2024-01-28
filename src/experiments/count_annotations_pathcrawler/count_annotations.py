@@ -59,7 +59,7 @@ def generations_with_pathcrawler_csv(program_str, csv):
 
 
 if __name__ == "__main__":
-    name = "Heat"
+    name = "TestCondCoverage1"
     count_annotations_pathcrawler(
         timestamp=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
         program_suite="pathcrawler_tests",

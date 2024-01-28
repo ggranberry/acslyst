@@ -6,6 +6,9 @@ import os
 
 
 class PathCrawlerHarness(Harness):
+    def __init__(self, annotated_programs_output_dir=None):
+        self.annotated_programs_output_dir = annotated_programs_output_dir
+
     def _generate_tasks(self):
         base_directory = "programs/pathcrawler_tests/"
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -22,9 +25,9 @@ class PathCrawlerHarness(Harness):
         headers_path = directory_path
 
         if not os.path.exists(oracle_file):
-            oracle_file= None
+            oracle_file = None
         if not os.path.exists(parameters_file):
-            parameters_file= None
+            parameters_file = None
 
         return Task(
             program_suite="pathcrawler_tests",
@@ -36,4 +39,5 @@ class PathCrawlerHarness(Harness):
             oracle_main="oracle_testme",
             parameters_file=parameters_file,
             timestamp=timestamp,
+            annotated_programs_output_dir=self.annotated_programs_output_dir,
         )

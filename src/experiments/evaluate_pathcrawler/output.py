@@ -17,9 +17,9 @@ class Outputter:
     def add_pathcrawler_result(self, res_dict):
        self.results.append(res_dict) 
 
-    def output_results(self):
+    def output_results(self, labels={}):
         max_dict = max(self.results, key=lambda x: (x['test_cases'], -x['interrupts']))
-        results = {"best": max_dict, "all": self.results}
+        results = {"best": max_dict, "all": self.results} | labels
         with open(f"{self.directory}/results.txt", "w") as file:
             file.write(str(results))
 

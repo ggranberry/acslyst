@@ -4,7 +4,7 @@ from .exceptions import (
     RepairException,
     PathcrawlerException,
 )
-from .chains import acsl_generation_chain, pathcrawler_chain, precondition_chain, paramters_chain
+from .chains import acsl_generation_chain, acsl_generation_pathcrawler_chain, parameters_chain
 from .repair import repair
 from .pathcrawler import run_pathcrawler
 from .annotation_evaluator import AnnotationEvaluator
@@ -54,30 +54,30 @@ def generate_acsl(
         outputter.output_exception(PathcrawlerException(e))
         return
 
-    try:
-        pathcrawler_program = generate_with_pathcrawler_csv(
-            oracle_file, repaired_choice_program, csv, outputter, program_file
-        )
-    except Exception as e:
-        outputter.output_exception(PathcrawlerException(e))
-        return
-
-    try:
-        repaired_pathcrawler_program = pathcrawler_repair(
-            pathcrawler_program, headers_path, outputter
-        )
-    except Exception as e:
-        outputter.output_exception(RepairException(e))
-        return
+    # try:
+    #     pathcrawler_program = generate_with_pathcrawler_csv(
+    #         oracle_file, repaired_choice_program, csv, outputter, program_file
+    #     )
+    # except Exception as e:
+    #     outputter.output_exception(PathcrawlerException(e))
+    #     return
+    #
+    # try:
+    #     repaired_pathcrawler_program = pathcrawler_repair(
+    #         pathcrawler_program, headers_path, outputter
+    #     )
+    # except Exception as e:
+    #     outputter.output_exception(RepairException(e))
+    #     return
 
     outputter.output_final(repaired_pathcrawler_program)
 
 
-def generate_preconditions_from_params(program, params_file):
-    candidates = [
-        precondition_chain.invoke({"program": program, "params": params_file})
-    ]
-    return [x for x in candidates if x is not None]
+# def generate_preconditions_from_params(program, params_file):
+#     candidates = [
+#         precondition_chain.invoke({"program": program, "params": params_file})
+#     ]
+#     return [x for x in candidates if x is not None]
 
 
 def generate_initial(content):
@@ -140,35 +140,35 @@ def generate_pathcrawler_csv(
     return csv
 
 
-def generate_with_pathcrawler_csv(
-    oracle_file, repaired_choice_program, csv, outputter, program_file
-):
-    oracle_text = "Not provided"
-    if oracle_file is not None:
-        with open(program_file) as oracle_content:
-            oracle_text = oracle_content.read()
-
-    pathcrawler_program, pathcrawler_classifications = pathcrawler_chain.invoke(
-        {"csv": csv, "program": repaired_choice_program, "oracle": oracle_text}
-    )
-    outputter.output_pathcrawler_program(
-        pathcrawler_program, pathcrawler_classifications
-    )
-    return pathcrawler_program
-
-
-def pathcrawler_repair(pathcrawler_program, headers_path, outputter):
-    repaired_pathcrawler_program = repair(
-        annotated_program=pathcrawler_program,
-        outputter=outputter,
-        headers_path=headers_path,
-        repair_step="with pathcrawler context",
-    )
-    outputter.set_pathcrawler_wp_results(
-        program=repaired_pathcrawler_program,
-        headers_path=headers_path,
-    )
-    return repaired_pathcrawler_program
+# def generate_with_pathcrawler_csv(
+#     oracle_file, repaired_choice_program, csv, outputter, program_file
+# ):
+#     oracle_text = "Not provided"
+#     if oracle_file is not None:
+#         with open(program_file) as oracle_content:
+#             oracle_text = oracle_content.read()
+#
+#     pathcrawler_program, pathcrawler_classifications = pathcrawler_chain.invoke(
+#         {"csv": csv, "program": repaired_choice_program, "oracle": oracle_text}
+#     )
+#     outputter.output_pathcrawler_program(
+#         pathcrawler_program, pathcrawler_classifications
+#     )
+#     return pathcrawler_program
+#
+#
+# def pathcrawler_repair(pathcrawler_program, headers_path, outputter):
+#     repaired_pathcrawler_program = repair(
+#         annotated_program=pathcrawler_program,
+#         outputter=outputter,
+#         headers_path=headers_path,
+#         repair_step="with pathcrawler context",
+#     )
+#     outputter.set_pathcrawler_wp_results(
+#         program=repaired_pathcrawler_program,
+#         headers_path=headers_path,
+#     )
+#     return repaired_pathcrawler_program
 
 
 if __name__ == "__main__":

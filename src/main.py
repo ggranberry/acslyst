@@ -7,6 +7,10 @@ from src.experiments.count_annotations.count_annotations import count_annotation
 from src.experiments.count_annotations_pathcrawler.count_annotations import (
     count_annotations_pathcrawler,
 )
+from src.experiments.evaluate_pathcrawler.evaluate_annotations import (
+    evaluate_annotations_pathcrawler,
+)
+import os
 
 
 def main(args):
@@ -28,6 +32,20 @@ def main(args):
         experiment = count_annotations_pathcrawler
     elif args.experiment == "count_eva":
         experiment = count_annotations_eva
+    elif args.experiment == "evaluate_pathcrawler":
+        if (
+            not hasattr(args, "annotations_output_dir")
+            or not args.annotations_output_dir
+        ):
+            raise Exception(
+                "The 'annotations_output_dir' argument is required for the 'evaluate_pathcrawler' experiment."
+            )
+        if not os.path.isdir(args.annotations_output_dir):
+            raise Exception(
+                f"The specified directory does not exist: {args.annotations_output_dir}"
+            )
+        harness = PathCrawlerHarness(args.annotations_output_dir)
+        experiment = evaluate_annotations_pathcrawler
     else:
         raise Exception(f"Invalid experiment name: {args.experiment}")
 
@@ -58,8 +76,14 @@ if __name__ == "__main__":
         "-e",
         "--experiment",
         required=True,
-        help="Specify the experiment: count, count_pathcrawler, count_eva",
-        choices=["count", "count_pathcrawler", "count_eva"],
+        help="Specify the experiment: count, count_pathcrawler, count_eva, evaluate_pathcrawler, evaluate_wp",
+        choices=[
+            "count",
+            "count_pathcrawler",
+            "count_eva",
+            "evaluate_pathcrawler",
+            "evaluate_wp",
+        ],
     )
     parser.add_argument(
         "-m",
@@ -67,6 +91,14 @@ if __name__ == "__main__":
         required=True,
         help="Specify the model: openai, gemini",
         choices=["openai", "gemini"],
+    )
+
+    # Optionally add the annotations_output_dir argument
+    # It will be checked for existence later if necessary
+    parser.add_argument(
+        "-o",
+        "--annotations_output_dir",
+        help="Specify the output directory for annotations (required for evaluate_pathcrawler)",
     )
 
     # Parse arguments
