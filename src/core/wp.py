@@ -1,13 +1,11 @@
 import os
-import tempfile
 import subprocess
 import tempfile
+from .temp import setup_wp_tmp
 
 
 def exec_wp(annotated_program: str, headers_path: str):
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".c", mode="w") as tmp_file:
-        tmp_file.write(annotated_program)
-        tmp_file_name = tmp_file.name
+    temp_file_path, temp_dir = setup_wp_tmp(headers_dir=headers_path, program_str=annotated_program)
     command = [
         "frama-c",
         "-wp",
@@ -16,29 +14,17 @@ def exec_wp(annotated_program: str, headers_path: str):
         "Alt-Ergo,Z3",
         "-no-cpp-frama-c-compliant",
         "-cpp-command",
-        f"gcc -C -E -I {headers_path}",
         "-wp-timeout",
         "10",
-        tmp_file_name,
+        temp_file_path,
     ]
     try:
         return subprocess.run(command, capture_output=True, text=True)
     finally:
-        os.remove(tmp_file_name)
+        os.remove(temp_dir)
 
 
 def extract_proofs_and_goals(wp_output: str):
-    lines = wp_output.split("\n")
-    maybe_proved = filter(lambda line: "Proved goals" in line, lines)
-    prove_line = next(maybe_proved, None)
-    if prove_line is None:
-        return -1, -1
-
-    _, after = prove_line.split(":", 1)
-    return after.split("/", 1)
-
-
-def extract_proof_count_score(wp_output: str):
     """
     extracts the number of proved annotations from the wp output which looks like this:
 
@@ -61,11 +47,11 @@ def extract_proof_count_score(wp_output: str):
     Z3 4.12.2:       1 (20ms)
     Timeout:         7
     """
-    proved, goals = extract_proofs_and_goals(wp_output)
-    ratio_proved = int(proved) / int(goals)
-    if ratio_proved >= 1:
-        return 0.75
-    elif ratio_proved >= 0.5:
-        return 0.5
-    else:
-        return 0.25
+    lines = wp_output.split("\n")
+    maybe_proved = filter(lambda line: "Proved goals" in line, lines)
+    prove_line = next(maybe_proved, None)
+    if prove_line is None:
+        return -1, -1
+
+    _, after = prove_line.split(":", 1)
+    return after.split("/", 1)

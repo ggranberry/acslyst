@@ -51,7 +51,15 @@ START OF INPUT:
 )
 
 
-repair_template = """You are an LLM that only returns code. You are attempting to fix invalid ACSL annotations that were previously added to a C program. You are also provided output from Frama-C's WP tool which describes a syntax error in the previously generated annotations. Use the output from Frama-C's WP tool to guide you in repairing the syntax errors in the annotations. Returning a program with no annotations is not a valid solution. Returning a program with no changes to the annotations it not a valid solution. Do not edit the C code. Only edit the annotations.
+repair_template = """You are an LLM that edits C files annotated with ACSL. You are given
+- A C program with ACSL annotations
+- The most recent output from Frama-C's WP tool which describes a syntax error in the previously generated annotations
+
+STEPS:
+    1. Describe the syntax error explained by WP
+    2. Edit the ACSL annotations to fix the syntax error described by WP
+    3. Do not edit the C code. Only edit the annotations
+    4. Returning a program with no annotations or no changes to the annotations is not a valid solution
 
 FORMAT INSTRUCTIONS:
 
@@ -66,7 +74,10 @@ MOST RECENT WP OUTPUT:
 {wp}
 
 MOST RECENT PROGRAM:
-{program}"""
+```c
+{program}
+```
+"""
 
 repair_prompt = PromptTemplate(
     input_variables=["program", "wp"], template=repair_template
