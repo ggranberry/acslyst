@@ -1,13 +1,13 @@
 import datetime
 import glob
 import os
-from src.core.temp import get_temp_dir
+import re
 
 from src.core.exceptions import (
     LLMException,
     PathcrawlerException,
 )
-from src.core.chains import parameters_chain, parameters_c_chain
+from src.core.chains import parameters_chain, parameters_chainV2
 
 from .output import Outputter
 
@@ -22,9 +22,59 @@ def evaluate_annotations_pathcrawler(
     timestamp: str,
     annotated_programs_output_dir: str,  # this is some directory where we put annotated programs
     oracle_file=None,
+    parameters_file=None,
 ):
-    # skip_programs = ["ADPCM1", "AssertAssume", "BugKpath", "DatesBranches", "FloatTritypeLabels", "Interp", "MergePrecond", "MergeWithBreaks", "Struct", "Test_ptr_out", "TestCondCoverage1", "TestCondCoverage3", "BsearchPrecond", "LabelsTcas", "MutualRecursion", "PointeurFonction", "Tritype", "VariableDimArray2", "Luhn", "Alias3", "Alias5", "BsearchPrecond", "IntTritypeLabels", "Luhn", "Merge", "PointeurFonction1", "PointeurFonction5", "Sample", "TestCondCoverage2", "VariableDimArray1", "MutualRecursionNoRecurLimit", "Alias1", "Alias2", "Alias4", "ApacheBranches", "Bsearch", "BsearchPrecond1", "Bsort", "EchoBranches", "ExNikoWCET", "ExSysC", "Heat", "Heat1", "LabelsTriTy", "MultiDimArray", "PointeurFonction2", "PointeurFonction4", "Tcas"]
-    skip_programs= ["MututalRecursionNoRecurLimit", "ADPCM1", "AssertAssume", "BsearchPrecond", "BsearchPrecond1", "BugKpath", "DatesBranches", "FloatTritypeLabels", "Interp", "IntTritypeLabels", "LabelsTcas", "MergePrecond", "MutualRecursion", "MergeWithBreaks", "PointeurFonction1", "PointeurFonction5", "Struct", "Test_ptr_out", "TestCondCoverage1", "TestCondCoverage3", "Tritype", "VariableDimArray2", "Luhn", "Alias1", "Alias2", "Alias3", "Alias4", "Alias5", "ApacheBranches", "Bsearch", "Bsort", "EchoBranches", "ExNikoWCET", "ExSysC", "Heat", "Heat1", "LabelsTriTyp", "Merge", "MultiDimArray", "MutualRecursionNoRecurLimit", "PointeurFonction2", "PointeurFonction4", "Sample", "Tcas", "TestCondCoverage2", "VariableDimArray1"]
+    always_skip = [
+        "Dates",
+        "Luhn",
+        "Apache",
+        "Tcas",
+        "TcasBranch",
+        "TestCondCoverage3",
+        "TestCondCoverage2",
+        "TestCondCoverage1",
+        "Heat",
+        "Heat1",
+        "ApacheBranches",
+    ]
+    skip_programs = [
+        "ADPCM1",
+        "AssertAssume",
+        "BsearchPrecond",
+        "BugKpath",
+        "DatesBranches",
+        "FloatTritypeLabels",
+        "Interp",
+        "IntTritypeLabels",
+        "LabelsTcas",
+        "MergePrecond",
+        "MergeWithBreaks",
+        "MutualRecursion",
+        "PointeurFonction1",
+        # "TestCondCoverage1",
+        # "TestCondCoverage3",
+        # "VariableDimArray2",
+        # "Luhn",
+        "Struct",
+        # "Alias1",
+        # "Alias3",
+        # "Alias5",
+        # "Bsearch",
+        # "BsearchPrecond1",
+        # "Bsort",
+        # "EchoBranches",
+        # "ExSysC",
+        # "Merge",
+        # "MutualRecursionNoRecurLimit",
+        # "PointeurFonction5",
+        # "Sample",
+        "Test_ptr_out",
+        "Tritype",
+        "VariableDimArray2"
+        # "VariableDimArray1"
+    ]
+    skip_programs = []
+    skip_programs = skip_programs + always_skip
     if program_name in skip_programs:
         return
     outputter = Outputter(program_name, program_suite, timestamp)
@@ -41,20 +91,25 @@ def evaluate_annotations_pathcrawler(
         base_name = os.path.basename(c_file)
         base_name, _ = os.path.splitext(base_name)
 
-        try:
-            # Run the analyzer and edit the params file that was generated
-            parameters = run_pathcrawler_analyzer(
-                base_name=base_name,
-                headers_dir=headers_path,
-                program_str=program_str,
-                main_function=main_function,
-            )
-        except Exception as e:
-            outputter.output_exception(PathcrawlerException(e))
-            continue
+        if parameters_file is None:
+            try:
+                # Run the analyzer and edit the params file that was generated
+                parameters = run_pathcrawler_analyzer(
+                    base_name=base_name,
+                    headers_dir=headers_path,
+                    program_str=program_str,
+                    main_function=main_function,
+                )
+            except Exception as e:
+                outputter.output_exception(PathcrawlerException(e))
+                continue
+        else:
+            with open(parameters_file) as file:
+                ground_truth = file.read()
+                parameters = clear_preconds(ground_truth, main_function)
 
         try:
-            params_file_str = parameters_chain.invoke(
+            params_file_str = parameters_chainV2.invoke(
                 {"program": program_str, "parameters": parameters}
             )
         except Exception as e:
@@ -62,7 +117,9 @@ def evaluate_annotations_pathcrawler(
             continue
 
         # Output the edited params file to our folder
-        outputter.output_file(program=params_file_str, file_name=f"{base_name}_params.pl")
+        outputter.output_file(
+            program=params_file_str, file_name=f"{base_name}_params.pl"
+        )
 
         try:
             csv = run_pathcrawler_generator(
@@ -84,10 +141,27 @@ def evaluate_annotations_pathcrawler(
     outputter.output_results()
 
 
+def clear_preconds(prolog_str, main_function):
+    pattern = r"(unquantif_preconds|quantif_preconds)\(.*?\)\.\n"
+
+    # Replace matched patterns with empty versions
+    return re.sub(
+        pattern,
+        lambda m: f"{m.group(1)}('{main_function}',[]).\n",
+        prolog_str,
+        flags=re.DOTALL,
+    )
+
+
 def analyze_csv(csv_string, base_name):
     # Check if the CSV string is empty
     if not csv_string.strip():
-        return {"base_name": base_name, "test_cases": -1, "interrupts": -1}
+        return {
+            "base_name": base_name,
+            "test_cases": -1,
+            "interrupts": -1,
+            "invalid_mem": -1,
+        }
 
     # Split the CSV string into lines
     lines = csv_string.strip().split("\n")
@@ -97,8 +171,14 @@ def analyze_csv(csv_string, base_name):
 
     # Count the number of rows containing the string "interrupt"
     num_interrupts = sum("interrupt" in line for line in lines[1:])  # Skip header
+    num_mem = sum("invalid" in line for line in lines[1:])  # Skip header
 
-    return {"base_name": base_name, "test_cases": num_rows, "interrupts": num_interrupts}
+    return {
+        "base_name": base_name,
+        "test_cases": num_rows,
+        "interrupts": num_interrupts,
+        "invalid_mem": num_mem,
+    }
 
 
 def run_pathcrawler_generator(
@@ -110,7 +190,7 @@ def run_pathcrawler_generator(
     headers_dir,
     outputter,
 ):
-    precond_file_name="params.pl"
+    precond_file_name = "params.pl"
     csv = run_pathcrawler(
         program_str=program_str,
         main_function=main_function,
@@ -125,7 +205,7 @@ def run_pathcrawler_generator(
 
 
 if __name__ == "__main__":
-    name = "MutualRecursionNoRecurLimit"
+    name = "Alias2"
     evaluate_annotations_pathcrawler(
         annotated_programs_output_dir="output/count_annotations_eva/backup_first_run",
         timestamp=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
@@ -133,5 +213,6 @@ if __name__ == "__main__":
         program_name=name,
         headers_path=f"programs/pathcrawler_tests/{name}/",
         main_function="testme",
+        parameters_file=f"programs/pathcrawler_tests/{name}/params.pl"
         # oracle_file=f"programs/pathcrawler_tests/{name}/OtherCfiles/oracle_testme.c"
     )

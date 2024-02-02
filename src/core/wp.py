@@ -1,11 +1,16 @@
 import os
 import subprocess
-import tempfile
+import json
+import re
+import shutil
 from .temp import setup_wp_tmp
 
 
-def exec_wp(annotated_program: str, headers_path: str):
-    temp_file_path, temp_dir = setup_wp_tmp(headers_dir=headers_path, program_str=annotated_program)
+def exec_wp(annotated_program: str, headers_path: str, main_method: str):
+    temp_file_path, temp_dir = setup_wp_tmp(
+        headers_dir=headers_path, program_str=annotated_program
+    )
+    report_path = os.path.join(temp_dir, "report.json")
     command = [
         "frama-c",
         "-wp",
@@ -13,15 +18,54 @@ def exec_wp(annotated_program: str, headers_path: str):
         "-wp-prover",
         "Alt-Ergo,Z3",
         "-no-cpp-frama-c-compliant",
-        "-cpp-command",
         "-wp-timeout",
-        "10",
+        "5",
+        "-main",
+        main_method,
+        "-wp-report-json",
+        report_path,
         temp_file_path,
     ]
     try:
-        return subprocess.run(command, capture_output=True, text=True)
+        result = subprocess.run(command, capture_output=True, text=True)
+
+        if result.returncode == 0:
+            with open(report_path, "r") as f:
+                report_str = f.read()
+                fixed_report_str = fix_json_number_format(report_str)
+                report = json.loads(fixed_report_str)
+        else:
+            report = None
+
+        return result, report
     finally:
-        os.remove(temp_dir)
+        shutil.rmtree(temp_dir)
+
+# wp has a bug in their json output
+def fix_json_number_format(json_string):
+    # Pattern to find numbers that end with a dot and are not followed by any digits
+    pattern = re.compile(r'(\d+)\.(?!\d)')
+    # Replace such numbers with the number itself (removing the dot)
+    return pattern.sub(r'\1', json_string)
+
+# def analyze_report(report):
+#     out = {
+#         "obligations": len(report),
+#         "proved": 0,
+#         "qed": 0,
+#         "alt_ergo": 0,
+#         "z3": 0,
+#         "ensures": 0,
+#         "ensures_proved": 0,
+#         "loop_assigns": 0,
+#         "loop_assigns_proved": 0,
+#         "loop_invariant": 0,
+#         "loop_invariant": 0,
+#         "loop_variant": 0,
+#         "rte_mem":
+#     }
+#     for obligation in report:
+#         continue
 
 
 def extract_proofs_and_goals(wp_output: str):

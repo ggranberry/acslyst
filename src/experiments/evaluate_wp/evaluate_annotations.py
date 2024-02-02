@@ -1,32 +1,26 @@
 import datetime
 import glob
 import os
-from src.core.temp import get_temp_dir
 
 from src.core.exceptions import (
-    PathcrawlerException,
     WPException,
 )
-from src.core.chains import parameters_chain, parameters_c_chain
 
 from .output import Outputter
 
-from src.core.pathcrawler import run_pathcrawler, run_pathcrawler_analyzer
-from src.core.wp import exec_wp
 from src.core.repair import repair
 
 
-def evaluate_annotations_pathcrawler(
+def evaluate_annotations_wp(
     program_suite: str,
     program_name: str,
     main_function: str,
     headers_path: str,
     timestamp: str,
     annotated_programs_output_dir: str,  # this is some directory where we put annotated programs
-    oracle_file=None,
 ):
+    # skip_programs = ["ADPCM1","AssertAssume","BsearchPrecond", "BsearchPrecond1", "DatesBranches", "FloatTritypeLabels", "LabelsTcas", "Luhn", "MergePrecond",  "MutualRecursion", "PointeurFonction1", "PointeurFonction5", "Test_ptr_out", "TestCondCoverage3" "MergeWithBreaks", "Struct", "BugKpath", "FloatTritypeLabels", "Tritype", "TestCondConverage1", "VariableDimArray2", "ADPCM", "MergeWithBreaks"]
     skip_programs = []
-    # skip_programs= ["MututalRecursionNoRecurLimit", "ADPCM1", "AssertAssume", "BsearchPrecond", "BsearchPrecond1", "BugKpath", "DatesBranches", "FloatTritypeLabels", "Interp", "IntTritypeLabels", "LabelsTcas", "MergePrecond", "MutualRecursion", "MergeWithBreaks", "PointeurFonction1", "PointeurFonction5", "Struct", "Test_ptr_out", "TestCondCoverage1", "TestCondCoverage3", "Tritype", "VariableDimArray2", "Luhn", "Alias1", "Alias2", "Alias3", "Alias4", "Alias5", "ApacheBranches", "Bsearch", "Bsort", "EchoBranches", "ExNikoWCET", "ExSysC", "Heat", "Heat1", "LabelsTriTyp", "Merge", "MultiDimArray", "MutualRecursionNoRecurLimit", "PointeurFonction2", "PointeurFonction4", "Sample", "Tcas", "TestCondCoverage2", "VariableDimArray1"]
     if program_name in skip_programs:
         return
     outputter = Outputter(program_name, program_suite, timestamp)
@@ -44,62 +38,23 @@ def evaluate_annotations_pathcrawler(
         base_name, _ = os.path.splitext(base_name)
 
         try:
-            repaired_program, proofs, goals = repair(annotated_program=program_str,outputter=outputter,repair_step="eval on pathcrawler", headers_path=headers_path)
+            _, report = repair(
+                annotated_program=program_str,
+                headers_path=headers_path,
+                main_method=main_function,
+            )
         except Exception as e:
-            outputter.output_exception(WPException(e))
+            outputter.output_exception(WPException(e), base_name)
             continue
-
-    outputter.output_results()
-
-
-def analyze_csv(csv_string, base_name):
-    # Check if the CSV string is empty
-    if not csv_string.strip():
-        return {"base_name": base_name, "test_cases": -1, "interrupts": -1}
-
-    # Split the CSV string into lines
-    lines = csv_string.strip().split("\n")
-
-    # The number of rows is the count of lines minus 1 for the header
-    num_rows = len(lines) - 1
-
-    # Count the number of rows containing the string "interrupt"
-    num_interrupts = sum("interrupt" in line for line in lines[1:])  # Skip header
-
-    return {"base_name": base_name, "test_cases": num_rows, "interrupts": num_interrupts}
-
-
-def run_pathcrawler_generator(
-    base_name: str,
-    params_file_str: str,
-    program_str: str,
-    main_function: str,
-    oracle_file,
-    headers_dir,
-    outputter,
-):
-    precond_file_name="params.pl"
-    csv = run_pathcrawler(
-        program_str=program_str,
-        main_function=main_function,
-        oracle_file=oracle_file,
-        headers_dir=headers_dir,
-        preconds_str=params_file_str,
-        precond_file_name=precond_file_name,
-    )
-
-    outputter.output_file(csv, f"{base_name}.csv")
-    return csv
-
+        outputter.output_wp_result(base_name,report)
 
 if __name__ == "__main__":
-    name = "MutualRecursionNoRecurLimit"
-    evaluate_annotations_pathcrawler(
-        annotated_programs_output_dir="output/count_annotations_eva/backup_first_run",
+    name = "EchoBranches"
+    evaluate_annotations_wp(
+        annotated_programs_output_dir="output/count_annotations_pathcrawler/third_run_headers/",
         timestamp=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
         program_suite="pathcrawler_tests",
         program_name=name,
         headers_path=f"programs/pathcrawler_tests/{name}/",
         main_function="testme",
-        # oracle_file=f"programs/pathcrawler_tests/{name}/OtherCfiles/oracle_testme.c"
     )

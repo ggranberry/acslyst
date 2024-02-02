@@ -18,10 +18,15 @@ class Outputter:
        self.results.append(res_dict) 
 
     def output_results(self, labels={}):
-        max_dict = max(self.results, key=lambda x: (x['test_cases'], -x['interrupts']))
-        results = {"best": max_dict, "all": self.results} | labels
-        with open(f"{self.directory}/results.txt", "w") as file:
-            file.write(str(results))
+        if all(res == {"test_cases": -1, "interrupts": -1, "invalid_mem": -1} for res in self.results):
+            with open(f"{self.directory}/bad_generations.txt", "w") as file:
+                file.write(str("Generations didn't parse"))
+            return
+        else:
+            max_dict = max(self.results, key=lambda x: (x['test_cases'], -(x['interrupts'] + x['invalid_mem'])))
+            results = {"best": max_dict, "all": self.results} | labels
+            with open(f"{self.directory}/results.txt", "w") as file:
+                file.write(str(results))
 
 
     def output_exception(self, exception):

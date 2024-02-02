@@ -1,31 +1,24 @@
 import os
+import json
 from collections import Counter
 
 
 class Outputter:
     def __init__(self, name, suite, timestamp):
         self.name = name
-        self.directory = f"output/evaluate_pathcrawler/{timestamp}/{self.name}"
+        self.directory = f"output/evaluate_wp/{timestamp}/{self.name}"
         os.makedirs(self.directory, exist_ok=True)
         self.suite = suite
         self.results = []
 
-    def output_file(self, program, file_name):
-        with open(f"{self.directory}/{file_name}", "w") as file:
-            file.write(program)
-
-    def add_pathcrawler_result(self, res_dict):
-       self.results.append(res_dict) 
-
-    def output_results(self, labels={}):
-        max_dict = max(self.results, key=lambda x: (x['test_cases'], -x['interrupts']))
-        results = {"best": max_dict, "all": self.results} | labels
-        with open(f"{self.directory}/results.txt", "w") as file:
-            file.write(str(results))
+    def output_wp_result(self, base_name, report):
+        result_path = os.path.join(self.directory, f"{base_name}.json")
+        with open(result_path, 'w') as file:
+            json.dump(report, file, indent=4)
 
 
-    def output_exception(self, exception):
-        with open(f"{self.directory}/error.txt", "w") as file:
+    def output_exception(self, exception, base_name):
+        with open(f"{self.directory}/{base_name}.txt", "w") as file:
             file.write(
                 f"\n\nException:\n{exception.message}\n\n{exception.original_exception}"
             )

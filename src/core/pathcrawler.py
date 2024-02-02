@@ -109,7 +109,7 @@ def exec_pathcrawler(
 
     cmd.append(tmp_file_path)
 
-    result = subprocess.run(cmd, check=False, stdout=subprocess.DEVNULL)
+    result = subprocess.run(cmd, check=False, stdout=subprocess.DEVNULL, timeout=120)
     return result
 
 

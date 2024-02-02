@@ -3,7 +3,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 import src.core.prompts as prompts
 from langchain.schema.output_parser import StrOutputParser
-from .sanitize import parse_annotated_c_program, parse_prolog_program
+from .sanitize import extract_c_program, parse_annotated_c_program, parse_prolog_program
 
 
 model = ChatOpenAI(model="gpt-4", max_tokens=4096)
@@ -16,10 +16,8 @@ acsl_generation_chain = (
 
 
 # Use the provided WP output to repair the annotations
-repair_chain = LLMChain(
-    prompt=prompts.repair_prompt,
-    llm=model,
-    output_parser=StrOutputParser(),
+repair_chain = (
+    prompts.repair_prompt | model | StrOutputParser() | extract_c_program
 )
 
 # Use the provided prolog file as context to generate precondition annotations
@@ -30,6 +28,10 @@ repair_chain = LLMChain(
 # Use the provided annotated program to edit the prolog file's input parameters
 parameters_chain = prompt = (
     prompts.parameters_prompt | model | StrOutputParser() | parse_prolog_program
+)
+
+parameters_chainV2= prompt = (
+    prompts.parameters_prompt2 | model | StrOutputParser() | parse_prolog_program
 )
 
 parameters_c_chain = prompt = (

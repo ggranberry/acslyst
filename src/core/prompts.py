@@ -103,24 +103,24 @@ Steps:
             true.
 
     c. Don't try to perform arithmetic or comparisons in the variable instantitiations. Instead create a quantified/unquantified condition if you need to
-    d. To create unquanfified expressions, use the "unquantif_preconds" function like below  which assures that the list called tab is at least size 3 and also larger than x and y
+    d. To create unquanfified expressions, use the "unquantif_preconds" function like below  which assures that the list called tab is at least size 3 and also larger than x and y. Notice that the left hand side of the conditional is the first argument. These translate to
         unquantif_preconds('testme', [
-            c(supegal, dim('tab'),3,  pre),
-            c(supegal, dim('tab'), 'x', pre),
-            c(supegal, dim('tab'), 'y', pre)
+            c(supegal, dim('tab'),3,  pre), % dim('tab') >= 3
+            c(supegal, dim('tab'), 'x', pre), % dim('tab') >= x
+            c(supegal, dim('tab'), 'y', pre) % dim('tab') >= y
         ]).
     e. To create quantified expressions, use the "quantif_preconds" function like below which specifies that for all indicies greater than or equal to 1, the value at index I is greater than the value at index I - 1
         quantif_preconds('testme', 
-            [Index],[c(supegal,Index,1,pre)],
+            [Index],[c(supegal,Index,1,pre)], 
             supegal,
-            e('tab',I),
+            e('tab',I), 
             e('tab',I – 1)),
             pre)
         ]).
     f. Addition and subtraction operation are handled using the <operator>(i(math)<val1>,<val2>) syntax in quantified/unquantified preconditions. For example the following qunatified precond states that for all UQV1 where UQV1 is greater than or equal to 1, the element at A[UQV1] >= A[UQV1 - 1].
-        quantif_preconds('testme',[uq_cond([UQV1],
-                                   [c(supegal,UQV1,1,pre)],
-                                   supegal,
+        quantif_preconds('testme',[uq_cond([UQV1], % Name the qualified var as UQV1
+                                   [c(supegal,UQV1,1,pre)], % State that all UQV1 >= 1
+                                   supegal, % State that all A[UQVi] >= A[UQV1 - 1]
                                    e('A',UQV1),
                                    e('A',-(i(math),UQV1,1)),
                                    pre)]).
@@ -133,6 +133,65 @@ FORMAT INSTRUCTIONS:
 
 Return the annotated prolog code wrapped in markdown
 ```prolog
+...
+```
+
+START OF INPUT:
+
+C PROGRAM:
+{program}
+
+PARAMETERS FILE:
+{parameters}"""
+)
+
+parameters_prompt2 = PromptTemplate.from_template(
+    """You are an LLM that edits prolog files. You are given
+- a C program annotated with ACSL
+- a prolog file used to generate input parameters for a C program
+
+Steps:
+1. Identify the preconditions defined in the ACSL annotations of the c program. 
+    a. They are defined as "requires" clauses (e.g. /*@ requires x > 0 */)
+    b. List dimensions are defined with the "valid" keyword clauses (e.g. /*@ requires \\valid(x+10 */)
+    c. Quantified expressions are defined with the "forall" keyword clauses (e.g. /*@ requires \\forall int i; 0 <= i < 10 ==> x[i] > 0 */)
+    d. Only look at the precondition annotations, ignore the program itself
+
+2. Edit the preconditions and qualified preconditions of the given prolog file to generate input parameters that satisfy the preconditions defined in the ACSL annotations of the c program
+    a. Only edit the unquantif_preconds and quantif_precond sections
+    b. To create unquanfified expressions, use the "unquantif_preconds" function like below  which assures that the list called tab is at least size 3 and also larger than x and y. Notice that the left hand side of the conditional is the first argument. These translate to
+        unquantif_preconds('testme', [
+            c(supegal, dim('tab'),3,  pre), % dim('tab') >= 3
+            c(supegal, dim('tab'), 'x', pre), % dim('tab') >= x
+            c(supegal, dim('tab'), 'y', pre) % dim('tab') >= y
+        ]).
+    c. To create quantified expressions, use the "quantif_preconds" function like below which specifies that for all indicies greater than or equal to 1, the value at index I is greater than the value at index I - 1
+        quantif_preconds('testme', 
+            [Index],[c(supegal,Index,1,pre)], 
+            supegal,
+            e('tab',I), 
+            e('tab',I – 1)),
+            pre)
+        ]).
+    d. Arithmetic operations are handled using the <operator>(i(math)<val1>,<val2>) syntax in quantified/unquantified preconditions. For example the following qunatified precond states that for all UQV1 where UQV1 is greater than or equal to 1, the element at A[UQV1] >= A[UQV1 - 1].
+        quantif_preconds('testme',[uq_cond([UQV1], % Name the qualified var as UQV1
+                                   [c(supegal,UQV1,1,pre)], % State that all UQV1 >= 1
+                                   supegal, % State that all A[UQVi] >= A[UQV1 - 1]
+                                   e('A',UQV1),
+                                   e('A',-(i(math),UQV1,1)),
+                                   pre)]).
+
+    e. The conditional operators are as follows: inf|infegal|sup|supegal|egal|diff 
+    f. Accessing an element of an Array in quantified/unquantified preconditions is done using the e('<variable>', <idx>) syntax
+    g. Do NOT edit the domain or create_value or ptr sections of the prolog file
+    h. Do not use macros like INT_MAX or INT_MIN for ranges
+
+FORMAT INSTRUCTIONS:
+
+Return the annotated prolog code wrapped in markdown
+```prolog
+<unedited prolog file portions>
+<edited preconditions portion>
 ...
 ```
 
