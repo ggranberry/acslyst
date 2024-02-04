@@ -24,10 +24,12 @@ def parse_file(file_path):
 def has_label(file_path):
     dir_path = os.path.dirname(file_path)  # Gets "/foo/bar"
     dir_name = os.path.basename(dir_path)  # Gets "bar"
-    label_path = os.path.join("programs/pathcrawler_tests",dir_name, "label.txt")
+    label_path = os.path.join("programs/pathcrawler_tests",dir_name, "labels.json")
     with open(label_path, 'r') as file:
         data = json.load(file)
-    if data.contains("array"):
+    # print(data)
+    labels = data['labels']
+    if "array" in labels or 'struct' in labels or 'pointer' in labels:
         return True
 
 def merge_counts(directories):
