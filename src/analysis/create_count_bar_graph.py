@@ -28,6 +28,7 @@ ax.set_xticks([i + bar_width for i in range(len(annotation_types))])
 ax.set_xticklabels(annotation_types, rotation=45, ha="right")
 ax.legend()
 
+plt.savefig('annotation_count_bar_graph.png')
 plt.tight_layout()
 plt.show()
 

@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 from collections import Counter
 
 def find_results_files(directory):
@@ -9,6 +10,8 @@ def find_results_files(directory):
                 yield os.path.join(root, file)
 
 def parse_file(file_path):
+    if has_label(file_path):
+        return {}
     try:
         with open(file_path, 'r') as file:
             # Use eval in a safer way
@@ -17,6 +20,15 @@ def parse_file(file_path):
     except SyntaxError as e:
         print(f"Error parsing file {file_path}: {e}")
         return {}
+
+def has_label(file_path):
+    dir_path = os.path.dirname(file_path)  # Gets "/foo/bar"
+    dir_name = os.path.basename(dir_path)  # Gets "bar"
+    label_path = os.path.join("programs/pathcrawler_tests",dir_name, "label.txt")
+    with open(label_path, 'r') as file:
+        data = json.load(file)
+    if data.contains("array"):
+        return True
 
 def merge_counts(directories):
     total_counts = Counter()
