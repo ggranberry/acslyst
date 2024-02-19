@@ -26,11 +26,12 @@ def count_annotations_eva(
         content = file.read()
 
     try:
-        report = run_eva(
+        res = run_eva(
             program_str=content,
             main_function=main_function,
             headers_dir=headers_path,
         )
+        report = res.stdout
 
         outputter.output_report(report)
     except Exception as e:
@@ -55,7 +56,7 @@ def generations_with_eva(program_str, report):
 
 
 if __name__ == "__main__":
-    name = "FibonacciRecurLimit"
+    name = "AssertAssume"
     count_annotations_eva(
         timestamp=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
         program_suite="pathcrawler_tests",

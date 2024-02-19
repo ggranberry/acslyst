@@ -83,6 +83,34 @@ repair_prompt = PromptTemplate(
     input_variables=["program", "wp"], template=repair_template
 )
 
+repair_eva_prompt = PromptTemplate.from_template("""
+You are an LLM that edits C files annotated with ACSL. You are given
+- A C program with ACSL annotations
+- The most recent output from Frama-C's Eva tool which describes a syntax error in the previously generated annotations
+
+STEPS:
+    1. Describe the syntax error explained by Eva
+    2. Edit the ACSL annotations to fix the syntax error described by Eva
+    3. Do not edit the C code. Only edit the annotations
+    4. Returning a program with no annotations or no changes to the annotations is not a valid solution
+
+FORMAT INSTRUCTIONS:
+
+Return the annotated c code wrapped in markdown
+```c
+...
+```
+
+START OF INPUT:
+
+MOST RECENT EVA OUTPUT:
+{eva}
+
+MOST RECENT PROGRAM:
+```c
+{program}
+```""")
+
 parameters_prompt = PromptTemplate.from_template(
     """You are an LLM that edits prolog files. You are given
 - a C program annotated with ACSL

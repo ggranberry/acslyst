@@ -18,6 +18,7 @@ def exec_wp(annotated_program: str, headers_path: str, main_method: str):
         "-wp-prover",
         "Alt-Ergo,Z3",
         "-no-cpp-frama-c-compliant",
+        "-lib-entry",
         "-wp-timeout",
         "5",
         "-main",

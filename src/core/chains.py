@@ -19,6 +19,9 @@ acsl_generation_chain = (
 repair_chain = (
     prompts.repair_prompt | model | StrOutputParser() | extract_c_program
 )
+repair_eva_chain = (
+    prompts.repair_eva_prompt | model | StrOutputParser() | extract_c_program
+)
 
 # Use the provided prolog file as context to generate precondition annotations
 # precondition_chain = prompt = (

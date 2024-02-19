@@ -10,6 +10,9 @@ from src.experiments.count_annotations_pathcrawler.count_annotations import (
 from src.experiments.evaluate_pathcrawler.evaluate_annotations import (
     evaluate_annotations_pathcrawler,
 )
+from src.experiments.evaluate_eva.evaluate_annotations import (
+    evaluate_annotations_eva,
+)
 from src.experiments.evaluate_wp.evaluate_annotations import evaluate_annotations_wp
 import os
 
@@ -61,6 +64,20 @@ def main(args):
             )
         harness = PathCrawlerHarness(args.annotations_output_dir)
         experiment = evaluate_annotations_wp
+    elif args.experiment == "evaluate_eva":
+        if (
+            not hasattr(args, "annotations_output_dir")
+            or not args.annotations_output_dir
+        ):
+            raise Exception(
+                "The 'annotations_output_dir' argument is required for the 'evaluate_wp' experiment."
+            )
+        if not os.path.isdir(args.annotations_output_dir):
+            raise Exception(
+                f"The specified directory does not exist: {args.annotations_output_dir}"
+            )
+        harness = PathCrawlerHarness(args.annotations_output_dir)
+        experiment = evaluate_annotations_eva
     else:
         raise Exception(f"Invalid experiment name: {args.experiment}")
 
@@ -91,13 +108,14 @@ if __name__ == "__main__":
         "-e",
         "--experiment",
         required=True,
-        help="Specify the experiment: count, count_pathcrawler, count_eva, evaluate_pathcrawler, evaluate_wp",
+        help="Specify the experiment: count, count_pathcrawler, count_eva, evaluate_pathcrawler, evaluate_wp, evaluate_eva",
         choices=[
             "count",
             "count_pathcrawler",
             "count_eva",
             "evaluate_pathcrawler",
             "evaluate_wp",
+            "evaluate_eva",
         ],
     )
     parser.add_argument(
