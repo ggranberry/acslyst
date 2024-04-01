@@ -12,12 +12,22 @@ data = {
         "eva": {'requires': 489, 'ensures': 335, 'loop invariant': 172, 'assert': 155, 'assigns': 149, 'loop assigns': 138, 'loop variant': 91, 'assumes': 40, 'behavior': 36, 'complete behaviors': 7, 'disjoint behaviors': 7, 'ghost': 6, 'predicate': 1}
         }
 
+body_data = {
+        "plain": {'loop invariant': 204, 'assert': 161, 'loop assigns': 139, 'loop variant': 130, 'assigns': 79, 'behavior': 35, 'assumes': 35, 'ensures': 31, 'requires': 12, 'ghost': 7},
+        "pc": {'loop invariant': 160, 'loop assigns': 111, 'assert': 92, 'loop variant': 87, 'assigns': 20, 'requires': 8, 'ensures': 4, 'ghost': 1},
+        "eva": {'loop invariant': 172, 'assert': 155, 'loop assigns': 138, 'loop variant': 91, 'assigns': 15, 'requires': 14, 'behavior': 9, 'assumes': 9, 'ensures': 6, 'ghost': 4}
+        }
+
+nonbody_data = {category: {key: data[category].get(key, 0) - body_data[category].get(key, 0)
+                          for key in data[category]}
+               for category in data}
+
 # Extracting all annotation types and their values for each set
-annotation_types = list(set().union(data['eva'], data['pc'], data['plain']))
+annotation_types = list(set().union(nonbody_data['eva'], nonbody_data['pc'], nonbody_data['plain']))
 sets = ['eva', 'pc', 'plain']
 
 # Preparing the values matrix for each annotation type across different sets
-values = [[data[set].get(annotation, 0) for annotation in annotation_types] for set in sets]
+values = [[nonbody_data[set].get(annotation, 0) for annotation in annotation_types] for set in sets]
 
 # Creating the bar graph for all annotation types
 fig, ax = plt.subplots(figsize=(14, 8)) # Adjusted for better display of all annotation types
@@ -30,7 +40,7 @@ for i, set_values in enumerate(values):
 
 ax.set_xlabel('Annotation Type')
 ax.set_ylabel('Number of Annotations')
-ax.set_title('Comparison of Annotation Types between Eva, PC, and Plain')
+ax.set_title('Comparison of Annotation Types not in function bodies between Eva, PC, and Plain')
 ax.set_xticks([i + bar_width for i in range(len(annotation_types))])
 ax.set_xticklabels(annotation_types, rotation=45, ha="right")
 ax.legend()
