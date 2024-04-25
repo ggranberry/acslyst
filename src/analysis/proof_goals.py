@@ -21,7 +21,7 @@ def count_proof_goals(directory):
                     report = json.loads(fixed_report_str)
                     # report = [goal for goal in report if "_rte_" in goal.get("goal", "")]
                     # report = [goal for goal in report if "_rte_" not in goal.get("goal", "") and "testme_requires" not in goal.get("goal", "") and "assigns" not in goal.get("goal", "")]
-                    # report = [goal for goal in report if "testme_requires" not in goal.get("goal", "")]
+                    report = [goal for goal in report if "ensures" in goal.get("goal", "")]
                     # report = [goal for goal in report if  "loop_invariant" in goal.get("goal", "")]
                     # report = [goal for goal in report if not "assigns" in goal.get("goal", "")]
 

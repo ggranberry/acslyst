@@ -1,6 +1,7 @@
-from .chains import repair_chain, repair_eva_chain
+from .chains import repair_chain, repair_eva_chain, gcc_repair_chain 
 from .wp import exec_wp
 from .eva import run_eva
+from .gcc import compile_program
 
 
 def repair(annotated_program, headers_path, main_method, max_retries=2, final_out=""):
@@ -55,3 +56,27 @@ def repair_eva(
         )
     else:
         return annotated_program, report, eva_output
+
+
+# Repair function for unannotated programs that only checks if something compiles
+def repair_compile(
+    headers_path, mutated_program, max_retries=2, final_out=""
+):
+    if max_retries <= 0:
+        raise ValueError(final_out)
+
+    result = compile_program(mutated_program, headers_path)
+    compile_output = result.stdout
+    if result.returncode != 0:
+        print("repairing...")
+        repair_result, _ = gcc_repair_chain.invoke(
+            {"gcc": compile_output, "program": mutated_program}
+        )
+        return repair_compile(
+            headers_path=headers_path,
+            mutated_program= repair_result,
+            max_retries=max_retries - 1,
+            final_out=result,
+        )
+    else:
+        return mutated_program 

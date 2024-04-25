@@ -2,13 +2,11 @@ import argparse
 from src.experiments.count_annotations_eva.count_annotations import (
     count_annotations_eva,
 )
+from src.experiments.mutate_programs.mutate_program import mutate_program
 from src.harnesses.pathcrawler_harness import PathCrawlerHarness
 from src.experiments.count_annotations.count_annotations import count_annotations
 from src.experiments.count_annotations_pathcrawler.count_annotations import (
     count_annotations_pathcrawler,
-)
-from src.experiments.evaluate_pathcrawler.evaluate_annotations import (
-    evaluate_annotations_pathcrawler,
 )
 from src.experiments.evaluate_eva.evaluate_annotations import (
     evaluate_annotations_eva,
@@ -32,24 +30,12 @@ def main(args):
 
     if args.experiment == "count":
         experiment = count_annotations
+    if args.experiment == "mutate":
+        experiment = mutate_program
     elif args.experiment == "count_pathcrawler":
         experiment = count_annotations_pathcrawler
     elif args.experiment == "count_eva":
         experiment = count_annotations_eva
-    elif args.experiment == "evaluate_pathcrawler":
-        if (
-            not hasattr(args, "annotations_output_dir")
-            or not args.annotations_output_dir
-        ):
-            raise Exception(
-                "The 'annotations_output_dir' argument is required for the 'evaluate_pathcrawler' experiment."
-            )
-        if not os.path.isdir(args.annotations_output_dir):
-            raise Exception(
-                f"The specified directory does not exist: {args.annotations_output_dir}"
-            )
-        harness = PathCrawlerHarness(args.annotations_output_dir)
-        experiment = evaluate_annotations_pathcrawler
     elif args.experiment == "evaluate_wp":
         if (
             not hasattr(args, "annotations_output_dir")
@@ -108,14 +94,14 @@ if __name__ == "__main__":
         "-e",
         "--experiment",
         required=True,
-        help="Specify the experiment: count, count_pathcrawler, count_eva, evaluate_pathcrawler, evaluate_wp, evaluate_eva",
+        help="Specify the experiment: count, count_pathcrawler, count_eva, evaluate_wp, evaluate_eva",
         choices=[
             "count",
             "count_pathcrawler",
             "count_eva",
-            "evaluate_pathcrawler",
             "evaluate_wp",
             "evaluate_eva",
+            "mutate",
         ],
     )
     parser.add_argument(

@@ -8,6 +8,8 @@ from src.core.chains import (
     acsl_generation_pathcrawler_chain
 )
 
+from src.core.skip import skip_programs
+
 from src.core.pathcrawler import run_pathcrawler
 
 from .output import Outputter
@@ -23,6 +25,8 @@ def count_annotations_pathcrawler(
     oracle_file=None,
     parameters_file=None,
 ):
+    if program_name in skip_programs:
+        return
     outputter = Outputter(program_name, program_suite, timestamp)
     with open(program_file) as file:
         content = file.read()

@@ -23,24 +23,6 @@ repair_eva_chain = (
     prompts.repair_eva_prompt | model | StrOutputParser() | extract_c_program
 )
 
-# Use the provided prolog file as context to generate precondition annotations
-# precondition_chain = prompt = (
-#     prompts.preconditions_prompt | model | StrOutputParser() | llm_output_parser
-# )
-
-# Use the provided annotated program to edit the prolog file's input parameters
-parameters_chain = prompt = (
-    prompts.parameters_prompt | model | StrOutputParser() | parse_prolog_program
-)
-
-parameters_chainV2= prompt = (
-    prompts.parameters_prompt2 | model | StrOutputParser() | parse_prolog_program
-)
-
-parameters_c_chain = prompt = (
-    prompts.parameters_c_prompt | model | StrOutputParser() | parse_annotated_c_program
-)
-
 # Generate ACSL annotations with a pathcrawler CSV as context
 acsl_generation_pathcrawler_chain = prompt = (
     prompts.generate_with_pathcrawler_prompt
@@ -56,3 +38,17 @@ acsl_generation_eva_chain = prompt = (
     | StrOutputParser()
     | parse_annotated_c_program
 )
+
+mutate_chain = (
+        prompts.mutate_program
+        | model
+        | StrOutputParser()
+        | parse_annotated_c_program
+        )
+
+gcc_repair_chain = (
+        prompts.gcc_repair_prompt
+        | model
+        | StrOutputParser()
+        | parse_annotated_c_program
+        )

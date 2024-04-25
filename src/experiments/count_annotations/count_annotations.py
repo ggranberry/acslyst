@@ -29,7 +29,6 @@ def count_annotations(
 
 
 def generate_initial(content):
-    # First we generate 5 initial attempts to try and find a good starting point
     initial_generations = [
         acsl_generation_chain.invoke({"program": content}) for _ in range(3)
     ]
@@ -37,11 +36,17 @@ def generate_initial(content):
 
 
 if __name__ == "__main__":
-    name = "TestCondCoverage3"
+    name = "Bsearch"
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    # count_annotations(
+    #     timestamp=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
+    #     program_suite="pathcrawler_tests",
+    #     program_name=name,
+    #     program_file=f"programs/pathcrawler_tests/{name}/f.c",
+    # )
     count_annotations(
         timestamp=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
-        program_suite="pathcrawler_tests",
+        program_suite="mutated",
         program_name=name,
-        program_file=f"programs/pathcrawler_tests/{name}/f.c",
+        program_file=f"programs/mutated/{name}/f.c",
     )

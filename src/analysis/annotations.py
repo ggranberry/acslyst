@@ -89,7 +89,7 @@ def count_acsl_annotations(comments):
 
     return {k: v for k, v in counts.items() if v > 0}
 
-def process_directory(directory_path):
+def process_directory(directory_path, function_bodies_only = False):
     # Compile the file name pattern for matching
     pattern = re.compile(r"initial_generation_\d+\.c$")
     
@@ -102,7 +102,10 @@ def process_directory(directory_path):
             repaired_exists, repaired_file_path = check_repaired_version_exists(path)
             if repaired_exists:
                 path = repaired_file_path
-            comments = extract_comments(str(path))
+            if function_bodies_only:
+                comments = extract_function_body_comments(str(path))
+            else:
+                comments = extract_comments(str(path))
             counts = count_acsl_annotations(comments)
             total_counts += counts
 
@@ -121,3 +124,13 @@ if __name__ == "__main__":
 
     eva_annotations = process_directory(eva_dir)
     print("Eva annotations:", eva_annotations)
+
+
+    plain_annotations = process_directory(plain_dir, True)
+    print("Plain body annotations:", plain_annotations)
+
+    pc_annotations = process_directory(pc_dir, True)
+    print("PC body annotations:", pc_annotations)
+
+    eva_annotations = process_directory(eva_dir, True)
+    print("Eva body annotations:", eva_annotations)

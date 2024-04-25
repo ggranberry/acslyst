@@ -64,9 +64,9 @@ def evaluate_annotations_wp(
 
 
 if __name__ == "__main__":
-    name = "Alias1"
+    name = "LabelsTriTyp"
     evaluate_annotations_wp(
-        annotated_programs_output_dir="output/count_annotations_eva/backup_first_run/",
+        annotated_programs_output_dir="output/count_annotations_pathcrawler/third_run_headers/",
         timestamp=datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
         program_suite="pathcrawler_tests",
         program_name=name,
